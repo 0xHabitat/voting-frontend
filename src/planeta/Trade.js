@@ -137,7 +137,7 @@ export default ({ metaAccount, web3, leap3 }) => {
       GOELLARS_COLOR
     ))[0];
 
-    const myPassportOutput = (await leap3.getUnspent(address, USA_COLOR))[0];
+    const myPassportOutput = (await leap3.getUnspent(address, USA_COLOR))[1];
 
     const condition = Tx.spendCond(
       [
