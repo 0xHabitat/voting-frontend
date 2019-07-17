@@ -85,6 +85,8 @@ export default ({ metaAccount, web3, leap3 }) => {
       ? metaAccount.address
       : (await web3.eth.getAccounts())[0];
 
+    const privateKey = metaAccount && metaAccount.privateKey;
+
     function unpackReceipt(receipt) {
       const passportColor = parseInt(receipt.substr(0, 4), 16);
       const address = "0x" + receipt.substr(4, 40).toLowerCase();
@@ -114,19 +116,19 @@ export default ({ metaAccount, web3, leap3 }) => {
       "hex"
     );
 
-    console.log("VERIFY", buffer.toString("hex"));
-    console.log("xxxx", hashPersonalMessage(buffer).toString("hex"));
+    //console.log("VERIFY", buffer.toString("hex"));
+    //console.log("xxxx", hashPersonalMessage(buffer).toString("hex"));
 
-    const theirAccount = await web3.eth.personal.ecRecover(
-      buffer.toString(),
-      their.signature
-    );
+    //const theirAccount = await web3.eth.personal.ecRecover(
+    //  buffer.toString(),
+    //  their.signature
+    //);
 
-    console.log(theirAccount);
+    //console.log(theirAccount);
 
-    if (theirAccount != their.address) {
-      throw "ecsignature doesn't match sender";
-    }
+    //if (theirAccount != their.address) {
+    //  throw "ecsignature doesn't match sender";
+    //}
 
     const leapOutput = (await leap3.getUnspent(EARTH_ADDR, LEAP_COLOR))[0];
     const co2Output = (await leap3.getUnspent(EARTH_ADDR, CO2_COLOR))[0];
@@ -148,6 +150,16 @@ export default ({ metaAccount, web3, leap3 }) => {
       []
     );
 
+    console.log(
+        theirPassportOutput.output.value,
+        "0x" + their.passportData,
+        their.signature,
+        myPassportOutput.output.value,
+        10,
+        "0x3378420181474D3aad9579907995011D6a545E3D",
+        "0x3378420181474D3aad9579907995011D6a545E3D"
+      )
+
     const earthContract = new web3.eth.Contract(EARTH_ABI);
     const data = await earthContract.methods
       .trade(
@@ -161,6 +173,8 @@ export default ({ metaAccount, web3, leap3 }) => {
       )
       .encodeABI();
     condition.inputs[0].setMsgData(data);
+
+    condition.sign([null, null, null, null, privateKey]);
 
     console.log(condition.hex(), data);
 
