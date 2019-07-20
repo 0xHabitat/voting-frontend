@@ -44,7 +44,9 @@ import base64url from 'base64url';
 import EthCrypto from 'eth-crypto';
 import { getStoredValue, storeValues, eraseStoredValue } from "./services/localStorage";
 import { fetchAllPassports } from "./services/plasma";
-import PlanetATrade from "./planeta/Trade";
+import PlanetAMoreButtons from "./planeta/MoreButtons";
+import PlanetAHandshake from "./planeta/Handshake";
+import PlanetAFinalizeHandshake from "./planeta/FinalizeHandshake";
 
 let LOADERIMAGE = burnerlogo
 let HARDCODEVIEW// = "loader"// = "receipt"
@@ -221,11 +223,14 @@ export default class App extends Component {
   openScanner(returnState){
     this.setState({returnState:returnState, scannerOpen: true})
   }
-  returnToState(scannerState){
+  returnToState(scannerState, nextView){
     let updateState = Object.assign({scannerState}, this.state.returnState);
     updateState.scannerOpen = false
     updateState.returnState = false
     console.log("UPDATE FROM RETURN STATE",updateState)
+    if (nextView) {
+      updateState.view = nextView;
+    }
     this.setState(updateState)
   }
   updateDimensions() {
@@ -266,6 +271,7 @@ export default class App extends Component {
 
     console.log("document.getElementsByClassName('className').style",document.getElementsByClassName('.btn').style)
     window.addEventListener("resize", this.updateDimensions.bind(this));
+    console.log("BAU BAU BAU BAU", window.location);
     if(window.location.pathname){
       console.log("PATH",window.location.pathname,window.location.pathname.length,window.location.hash)
       if(window.location.pathname.indexOf("/pk")>=0){
@@ -939,6 +945,49 @@ export default class App extends Component {
                 )
 
                 switch(view) {
+                  case 'planet_a_handshake':
+                  return (
+                    <div>
+                      {this.state.scannerOpen ? sendByScan : null}
+                      <Card>
+                        <NavCard title="Handshake" goBack={this.goBack.bind(this)}/>
+                        {defaultBalanceDisplay}
+                        <PlanetAHandshake
+                            changeAlert={this.changeAlert}
+                            changeView={this.changeView}
+                            goBack={this.goBack.bind(this)}
+                            web3={this.state.web3}
+                            leap3={this.state.xdaiweb3}
+                            metaAccount={this.state.metaAccount}
+                        />
+                      </Card>
+                      <Bottom
+                        action={this.goBack.bind(this)}
+                      />
+                    </div>
+                  );
+                  case 'planet_a_finalize_handshake':
+                  return (
+                    <div>
+                      {this.state.scannerOpen ? sendByScan : null}
+                      <Card>
+                        <NavCard title="Finalize Handshake" goBack={this.goBack.bind(this)}/>
+                        {defaultBalanceDisplay}
+                        <PlanetAFinalizeHandshake
+                            changeAlert={this.changeAlert}
+                            changeView={this.changeView}
+                            scannerState={this.state.scannerState}
+                            goBack={this.goBack.bind(this)}
+                            web3={this.state.web3}
+                            leap3={this.state.xdaiweb3}
+                            metaAccount={this.state.metaAccount}
+                        />
+                      </Card>
+                      <Bottom
+                        action={this.goBack.bind(this)}
+                      />
+                    </div>
+                  );
                   case 'main':
                   return (
                     <div>
@@ -956,10 +1005,8 @@ export default class App extends Component {
                           currencyDisplay={this.currencyDisplay}
                         />
 
-                        <PlanetATrade
-                          web3={this.state.web3}
-                          leap3={this.state.xdaiweb3}
-                          metaAccount={this.state.metaAccount}
+                        <PlanetAMoreButtons
+                          changeView={this.changeView}
                         />
 
                         <RecentTransactions
