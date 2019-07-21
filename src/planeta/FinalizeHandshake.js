@@ -1,11 +1,5 @@
 import React from "react";
-import cookie from "react-cookies";
-import Blockies from "react-blockies";
-import { scroller } from "react-scroll";
-import queryString from "query-string";
-import { Box, Field, Input } from "rimble-ui";
-import { PrimaryButton, BorderButton } from "../components/Buttons";
-
+import { PrimaryButton } from "../components/Buttons";
 import { finalizeHandshake } from "./utils";
 
 export default class FinalizeHandshake extends React.Component {
@@ -35,7 +29,6 @@ export default class FinalizeHandshake extends React.Component {
   render() {
     const {
       changeView,
-      changeAlert,
       goBack,
       metaAccount,
       web3,

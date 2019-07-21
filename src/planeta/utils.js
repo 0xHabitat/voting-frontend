@@ -8,9 +8,8 @@
 
 */
 
-import { Tx, Input, Output, Util } from "leap-core";
 import Web3 from "web3";
-import { toHex, bytesToHex, padLeft } from "web3-utils";
+import { bytesToHex, padLeft } from "web3-utils";
 import { ecsign, hashPersonalMessage, ripemd160 } from "ethereumjs-util";
 import { LeapContract } from "./leap-utils";
 

@@ -2,8 +2,8 @@ import React from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import getConfig from "../config";
 import i18n from "../i18n";
-import { Flex, Box, PublicAddress, QR as QRCode } from "rimble-ui";
-import { startHandshake, finalizeHandshake } from "./utils";
+import { Flex, Box, QR as QRCode } from "rimble-ui";
+import { startHandshake } from "./utils";
 
 const CONFIG = getConfig();
 
@@ -27,7 +27,6 @@ export default class Handshake extends React.Component {
       changeAlert,
       goBack,
       metaAccount,
-      web3,
       leap3
     } = this.props;
     const { passport } = this.state;

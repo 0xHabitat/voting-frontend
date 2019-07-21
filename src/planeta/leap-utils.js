@@ -1,4 +1,4 @@
-import { Tx, Input, Output, Util } from "leap-core";
+import { Tx, Input, Output } from "leap-core";
 
 class LeapMethodCall {
   constructor(leap3, data) {
