@@ -44,6 +44,7 @@ import base64url from 'base64url';
 import EthCrypto from 'eth-crypto';
 import { getStoredValue, storeValues, eraseStoredValue } from "./services/localStorage";
 import { fetchAllPassports } from "./services/plasma";
+import PlanetATrade from "./planeta/Trade";
 
 let LOADERIMAGE = burnerlogo
 let HARDCODEVIEW// = "loader"// = "receipt"
@@ -953,6 +954,12 @@ export default class App extends Component {
                           changeAlert={this.changeAlert}
                           changeView={this.changeView}
                           currencyDisplay={this.currencyDisplay}
+                        />
+
+                        <PlanetATrade
+                          web3={this.state.web3}
+                          leap3={this.state.xdaiweb3}
+                          metaAccount={this.state.metaAccount}
                         />
 
                         <RecentTransactions
