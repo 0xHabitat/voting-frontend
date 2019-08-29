@@ -12,14 +12,15 @@ export const fetchBalanceCard = async (plasma, account) => {
       id: getId(firstCard),
       data: getData(firstCard)
     };
-    console.log(result);
     return result;
   });
 };
 export const getUTXOs = async (plasma, account, color) => {
+  console.log(`Fetch unspent for ${color}`);
   const utxos = await plasma.send("plasma_unspent", [account]);
+  console.log({utxos});
   return utxos
-    .filter(utxo => utxo.output.color === color)
+    .filter(utxo => utxo.output.color === parseInt(color))
     .map(utxo => {
       return {
         outpoint: Outpoint.fromRaw(utxo.outpoint),
