@@ -329,7 +329,7 @@ export default class App extends Component {
       }
     }
 
-    interval = setInterval(this.poll, 1500);
+    interval = setInterval(this.poll, 2000);
   }
 
   componentWillUnmount() {
@@ -820,17 +820,18 @@ export default class App extends Component {
   }
 
   render() {
-    const { creditsBalance, tokensBalance, account, balanceCard } = this.state;
-    const { xdaiweb3 } = this.state;
+    const { creditsBalance, tokensBalance } = this.state;
+    const { xdaiweb3, web3, account, metaAccount } = this.state;
+    const web3props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
       <ThemeProvider theme={theme}>
         <I18nextProvider i18n={i18n}>
           <MainContainer>
             <Header credits={creditsBalance} tokens={tokensBalance} />
             <VoteControls
+              proposalId={0}
               credits={creditsBalance}
-              account={account}
-              plasma={xdaiweb3}
+              {...web3props}
             />
           </MainContainer>
           <Dapparatus
@@ -849,7 +850,6 @@ export default class App extends Component {
               //console.log("DAPPARATUS UPDATE",state)
 
               if (state.xdaiweb3) {
-
                 let voiceCreditsContract;
                 let voiceTokensContract;
                 const StableABI = require("./contracts/StableCoin.abi.js");
