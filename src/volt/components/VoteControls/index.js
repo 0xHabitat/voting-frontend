@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Tx, Input, Output } from "leap-core";
+import { providers, utils } from "ethers";
 import SMT from "../../lib/SparseMerkleTree";
+import { getStoredValue, storeValues } from "../../../services/localStorage";
 
 import { Equation } from "./GridDisplay";
 import { Choice } from "./Choice";
@@ -15,11 +17,13 @@ import proposals from "../../proposals";
 import { votesToValue, getUTXOs } from "../../utils";
 import { abi, bytecode } from "../../contracts/voteBooth";
 import { voltConfig } from "../../config";
-import {getId} from "../../../services/plasma";
+import { getId } from "../../../services/plasma";
+
+const RPC = "https://testnet-node1.leapdao.org";
+const plasma = new providers.JsonRpcProvider(RPC);
 
 class VoteControls extends Component {
   constructor(props) {
-    console.log(props.account);
     super(props);
     this.state = {
       expanded: false,
@@ -47,27 +51,35 @@ class VoteControls extends Component {
   }
 
   async submit() {
-    const { account, plasma } = this.props;
+    const { account, metaAccount, web3 } = this.props;
+    console.log(account);
+    console.log({ metaAccount });
+    console.log({ web3 });
+    const { proposalId } = this.props;
     const { choice, votes } = this.state;
     console.log(`Submit Choice: ${votes} for ${choice} from ${account}`);
     const { hex, string } = votesToValue(votes);
-    const sign =  choice === "Yes" ? 1 : -1;
+    const sign = choice === "Yes" ? 1 : -1;
     const voiceCredits = sign * votes * 10 ** 18;
 
     const { boothAddress } = proposals[0];
     const balanceCardColor = voltConfig.BALANCE_CARD_COLOR;
     const balanceCardAddress = voltConfig.CONTRACT_VOICE_BALANCE_CARD;
-    const balanceCards = await plasma.getUnspent(account, balanceCardColor);
-    console.log({balanceCards});
+    const balanceCards = await getUTXOs(plasma, account, balanceCardColor);
+    console.log({ balanceCards });
     const balanceCard = balanceCards[0];
     const balanceCardId = getId(balanceCard);
 
     const voiceCreditsColor = voltConfig.VOICE_CREDITS_COLOR;
-    const voiceCreditsUTXOs = await plasma.getUnspent(account, voiceCreditsColor);
-    console.log({voiceCreditsUTXOs});
+    const voiceCreditsUTXOs = await getUTXOs(
+      plasma,
+      account,
+      voiceCreditsColor
+    );
+    console.log({ voiceCreditsUTXOs });
 
     // TODO: Do we need to get several here?
-    const gasUTXOs = await plasma.getUnspent(boothAddress, 0);
+    const gasUTXOs = await getUTXOs(plasma, boothAddress, 0);
     console.log(gasUTXOs);
     const gas = gasUTXOs[0];
     const script = Buffer.from(bytecode, "hex");
@@ -90,19 +102,53 @@ class VoteControls extends Component {
       ]
     );
 
-    // TODO: Read SMT from local storage
-    const tree = new SMT(9);
-    const proof = tree.createMerkleProof(0);
+    let tree;
+    let castedVotes;
+    let localTree = getStoredValue("votes", account);
+    if (!localTree) {
+      console.log("local tree is empty");
+      tree = new SMT(9);
+      castedVotes = 0;
+    } else {
+      const parsedTree = JSON.parse(localTree);
+      console.log({ parsedTree });
+      tree = new SMT(9, parsedTree);
+      castedVotes = parsedTree[proposalId];
+    }
+    const proof = tree.createMerkleProof(proposalId);
+    window.tree = tree;
 
-    const data = plasma.eth.abi.encodeParameters(
-      ["uint256", "bytes", "int256", "int256"],
-      [ balanceCardId, proof, votes, 0 ] //
+    console.log({balanceCardId, proof, votes, castedVotes});
+
+    const voteBoothABI = new utils.Interface(abi);
+    const castBallotParams = voteBoothABI.functions.castBallot.encode([
+      parseInt(balanceCardId),
+      proof,
+      parseInt(votes),
+      castedVotes
+    ]);
+    console.log(castBallotParams);
+
+    condition.inputs[0].setMsgData(castBallotParams);
+
+    // Sign Spending Condition
+    if (metaAccount && metaAccount.privateKey) {
+      // TODO: Check that this is working on mobile, where you don't have Metamask
+      condition.signAll(metaAccount.privateKey);
+    } else {
+      console.log("Waiting for sign with metamask");
+      await condition.signWeb3(web3);
+      console.log("Signed!");
+    }
+
+    // Check Spending Condition
+    const response = await plasma.send("checkSpendingCondition",
+      [condition.hex()]
     );
 
-    condition.inputs[0].setMsgData(data);
+    console.log("Spending condition checked");
+    console.log({ response });
 
-    // TODO: Sign transaction here
-    // TODO: Check Spending Condition
     // TODO: Update outputs accordingly
     // TODO: Submit transition to blockchain
     // TODO: Update local SMT
