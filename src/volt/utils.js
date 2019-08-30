@@ -29,20 +29,31 @@ export const getUTXOs = async (plasma, account, color) => {
     });
 };
 
+export const replaceAll = (str, find, replace) => {
+  console.log(replace);
+  return str.replace(new RegExp(find, "g"), replace.replace("0x", ""));
+};
+
 export const pad = a => {
   const str = a.toString();
   if (str.length === 3) return a;
   if (str.length === 1) return `00${a}`;
   return `0${a}`;
 };
+
+export const padHex = (hex, limit) => web3.utils.padLeft(hex, limit);
+
+export const toHex = (num, limit) => {
+  const hex = web3.utils.toHex(num).toUpperCase();
+  return web3.utils.padLeft(hex, limit);
+};
+
 export const votesToValue = voteNum => {
   const zeroes = "000000000000000000"; // 18 digits for ERC20 token
   const voteCredits = `${voteNum}${zeroes}`;
 
-  const hex = web3.utils.toHex(voteCredits).toUpperCase();
-  const paddedHex = web3.utils.padLeft(hex, 64);
   return {
-    hex: paddedHex,
+    hex: toHex(voteCredits, 64),
     string: voteCredits
   };
 };
