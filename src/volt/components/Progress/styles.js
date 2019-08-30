@@ -63,7 +63,7 @@ export const InfiniteProgress = styled(Flex).attrs(() => ({
     background-color: white;
     position: absolute;
     border-radius: 16px;
-    animation: ${loading} 0.35s linear alternate infinite;
+    animation: ${loading} 1s linear alternate infinite;
   }
 `;
 
