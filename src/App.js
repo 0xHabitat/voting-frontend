@@ -49,6 +49,7 @@ import {
 import { voltConfig as VOLT_CONFIG } from "./volt/config";
 import { MainContainer } from "./volt/components/Common";
 import { Header } from "./volt/components/Header";
+import Menu from './volt/components/Menu';
 import VoteControls from "./volt/components/VoteControls";
 import Progress from "./volt/components/Progress";
 import Receipt from "./volt/components/Receipt";
@@ -102,9 +103,7 @@ export default class App extends Component {
       ethprice: 0.0,
       hasUpdateOnce: false,
       possibleNewPrivateKey: "",
-      // NOTE: USD in exchangeRates is undefined, such that any result using this
-      // number becomes NaN intentionally until it's defined.
-      exchangeRates: {}
+      isMenuOpen: false
     };
     this.alertTimeout = null;
 
@@ -132,56 +131,11 @@ export default class App extends Component {
 
     this.poll = this.poll.bind(this);
     this.setPossibleNewPrivateKey = this.setPossibleNewPrivateKey.bind(this);
-    this.currencyDisplay = this.currencyDisplay.bind(this);
-    this.convertCurrency = this.convertCurrency.bind(this);
+    this.openMenu = this.openMenu.bind(this);
+    this.closeMenu = this.closeMenu.bind(this);
   }
 
-  // NOTE: This function is for _displaying_ a currency value to a user. It
-  // adds a currency unit to the beginning or end of the number!
-  currencyDisplay(amount, toParts = false, convert = true) {
-    const { account } = this.state;
-    const locale = getStoredValue("i18nextLng");
-    const symbol =
-      getStoredValue("currency", account) || CONFIG.CURRENCY.DEFAULT_CURRENCY;
 
-    if (convert) {
-      amount = this.convertCurrency(amount, `${symbol}/USD`);
-    }
-
-    const formatter = new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: symbol,
-      maximumFractionDigits: 2
-    });
-    return toParts ? formatter.formatToParts(amount) : formatter.format(amount);
-  }
-
-  /*
-   * Pair is supposed to be a currency pair according to ISO 4217. Format must
-   * be BASE/COUNTER.
-   *
-   * convertCurrency then ALWAYS converts from COUNTER => BASE. Amount must
-   * be quoted in the base currency. An example:
-   *
-   * convertCurrency(1, "EUR/USD"):
-   * returns (0.81 / 1) * $1, so essentially converts $1 to 0.81€.
-   *
-   * or
-   *
-   * convertCurrency(1, "USD/EUR"):
-   * returns (1 / 0.81) * €1, so essentially converts €1 to 1.23$.
-   *
-   * NOTE: This function assumes 1 DAI = 1 USD!
-   */
-  convertCurrency(amount, pair) {
-    const { exchangeRates } = this.state;
-    const [base, counter] = pair.split("/");
-
-    const baseRate = exchangeRates[base];
-    const counterRate = exchangeRates[counter];
-
-    return (baseRate / counterRate) * amount;
-  }
 
   parseAndCleanPath(path) {
     let parts = path.split(";");
@@ -819,20 +773,36 @@ export default class App extends Component {
     }
   }
 
+  // VOLT Methods
+  openMenu(){
+    this.setState((state)=>({
+      ...state,
+      isMenuOpen: true
+    }))
+  }
+  closeMenu(){
+    this.setState((state)=>({
+      ...state,
+      isMenuOpen: false
+    }))
+  }
+
   render() {
     const { creditsBalance, tokensBalance } = this.state;
     const { xdaiweb3, web3, account, metaAccount } = this.state;
+    const { isMenuOpen } = this.state;
     const web3props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
       <ThemeProvider theme={theme}>
         <I18nextProvider i18n={i18n}>
           <MainContainer>
-            <Header credits={creditsBalance} tokens={tokensBalance} />
-            <VoteControls
+            {isMenuOpen && <Menu onClose={this.closeMenu}/>}
+            <Header credits={creditsBalance} openMenu={this.openMenu}/>
+{/*            <VoteControls
               proposalId={0}
               credits={creditsBalance}
               {...web3props}
-            />
+            />*/}
           </MainContainer>
           <Dapparatus
             config={{
