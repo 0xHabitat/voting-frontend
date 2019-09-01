@@ -6,6 +6,7 @@ import SMT from "../../lib/SparseMerkleTree";
 import { getStoredValue, storeValues } from "../../../services/localStorage";
 
 import votingBoothArtifact from "../../contracts/VotingBooth";
+import ballotBoxInterface from '../../contracts/ballotBox'
 
 import { Equation } from "./GridDisplay";
 import { Choice } from "./Choice";
@@ -52,7 +53,8 @@ class VoteControls extends Component {
     this.signVote = this.signVote.bind(this);
     this.processVote = this.processVote.bind(this);
 
-    this.submit = this.submit.bind(this);
+    this.submitVote = this.submitVote.bind(this);
+    this.withdrawVote = this.withdrawVote.bind(this);
 
     console.log(votingBoothArtifact.abi);
   }
@@ -285,7 +287,7 @@ class VoteControls extends Component {
     return receipt;
   }
 
-  async submit() {
+  async submitVote() {
     console.log("Display Progress Screen");
     this.setProgressState(true);
 
@@ -317,6 +319,11 @@ class VoteControls extends Component {
 
     // TODO: Update local SMT
     // TODO: Show receipt
+  }
+
+  async withdrawVote() {
+    console.log("Display Progress Screen");
+    this.setProgressState(true);
   }
 
   setProgressState(bool) {
@@ -395,8 +402,11 @@ class VoteControls extends Component {
           selection={choice}
           onChange={this.setChoice}
         />
-        <ActionButton disabled={disabled} onClick={this.submit}>
+        <ActionButton disabled={disabled} onClick={this.submitVote}>
           Send Vote
+        </ActionButton>
+        <ActionButton onClick={this.withdrawVote}>
+          Withdraw
         </ActionButton>
       </Container>
     );
