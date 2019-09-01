@@ -6,30 +6,14 @@ import Web3 from "web3";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
 import "./App.scss";
-// import Header from './components/Header';
-import NavCard from "./components/NavCard";
-import SendByScan from "./components/SendByScan";
-import SendToAddress from "./components/SendToAddress";
-import Bity from "./components/Bity";
-import BityHistory from "./components/BityHistory";
-import WithdrawFromPrivate from "./components/WithdrawFromPrivate";
-import RequestFunds from "./components/RequestFunds";
-import Receive from "./components/Receive";
-import Share from "./components/Share";
-import ShareLink from "./components/ShareLink";
-import Balance from "./components/Balance";
-import GoellarsBalance from "./components/GoellarsBalance";
-import MainCard from "./components/MainCard";
+
 import History from "./components/History";
 import Advanced from "./components/Advanced";
 import RecentTransactions from "./components/RecentTransactions";
-import Footer from "./components/Footer";
+
 import Loader from "./components/Loader";
 import burnerlogo from "./assets/burnerwallet.png";
-import BurnWallet from "./components/BurnWallet";
-import Bottom from "./components/Bottom";
-import Card from "./components/StyledCard";
-import { Passports, getDefaultPassport } from "./components/Passports";
+
 import incogDetect from "./services/incogDetect.js";
 import { ThemeProvider } from "rimble-ui";
 import theme from "./theme";
@@ -58,6 +42,7 @@ import SMT from "./volt/lib/SparseMerkleTree";
 import ProposalsList from "./volt/components/ProposalsList";
 import SortContols from "./volt/components/SortControls";
 import FilterControls from "./volt/components/FilterControls";
+import Footer from "./volt/components/Footer";
 
 let LOADERIMAGE = burnerlogo;
 let HARDCODEVIEW; // = "loader"// = "receipt"
@@ -880,6 +865,7 @@ export default class App extends Component {
       filterQuery,
       favorites
     } = this.state;
+    const { voteStartTime, voteEndTime } = this.state;
     const web3props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
       <ThemeProvider theme={theme}>
@@ -898,6 +884,15 @@ export default class App extends Component {
                 list={filteredList}
                 toggle={this.toggleFavorites}
                 favorites={favorites}
+              />
+              <Footer
+                voteStartTime={voteStartTime}
+                voteEndTime={voteEndTime}
+                history={[
+                  { id: "EA001", votes: 2 },
+                  { id: "EA003", votes: 4 },
+                  { id: "EA002", votes: 1 }
+                ]}
               />
               {/*            <VoteControls
               proposalId={0}
