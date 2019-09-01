@@ -3,11 +3,12 @@ import styled, { keyframes } from "styled-components";
 
 export const Container = styled(Flex).attrs(() => ({
   bg: "voltBrandMain",
-  px: '4rem',
-  pt: '8rem',
+  px: '3rem',
+  pt: '6rem',
   pb: '3rem',
   flexDirection: "column",
-  justifyContent: "space-between"
+  justifyContent: "space-between",
+  alignItems: 'center'
 }))`
   position: absolute;
   width: 100%;
