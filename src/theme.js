@@ -16,7 +16,7 @@ export default {
     sansSerif: '"Ubuntu", -apple-system, sans-serif',
   },
   space: [
-    0, 4, 8, 16, 32, 64, 128, 256
+    0, 4, 8, 16, 24, 32, 64, 128, 256
   ],
   radii: [
     '0', '4px', '8px', '16px'
