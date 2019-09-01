@@ -49,12 +49,15 @@ import {
 import { voltConfig as VOLT_CONFIG } from "./volt/config";
 import { MainContainer } from "./volt/components/Common";
 import { Header } from "./volt/components/Header";
-import Menu from './volt/components/Menu';
+import Menu from "./volt/components/Menu";
 import VoteControls from "./volt/components/VoteControls";
 import Progress from "./volt/components/Progress";
 import Receipt from "./volt/components/Receipt";
-import { fetchBalanceCard, votesToValue } from "./volt/utils";
+import { fetchBalanceCard, votesToValue, contains } from "./volt/utils";
 import SMT from "./volt/lib/SparseMerkleTree";
+import ProposalsList from "./volt/components/ProposalsList";
+import SortContols from "./volt/components/SortControls";
+import FilterControls from "./volt/components/FilterControls";
 
 let LOADERIMAGE = burnerlogo;
 let HARDCODEVIEW; // = "loader"// = "receipt"
@@ -87,6 +90,7 @@ export default class App extends Component {
     }
     console.log("CACHED VIEW", view);
     super(props);
+
     this.state = {
       web3: false,
       account: false,
@@ -103,7 +107,11 @@ export default class App extends Component {
       ethprice: 0.0,
       hasUpdateOnce: false,
       possibleNewPrivateKey: "",
-      isMenuOpen: false
+      isMenuOpen: false,
+      filterQuery: "",
+      filteredList: [],
+      sortedList: [],
+      favorites: {}
     };
     this.alertTimeout = null;
 
@@ -133,9 +141,11 @@ export default class App extends Component {
     this.setPossibleNewPrivateKey = this.setPossibleNewPrivateKey.bind(this);
     this.openMenu = this.openMenu.bind(this);
     this.closeMenu = this.closeMenu.bind(this);
+    this.sort = this.sort.bind(this);
+    this.filterList = this.filterList.bind(this);
+    this.resetFilter = this.resetFilter.bind(this);
+    this.toggleFavorites = this.toggleFavorites.bind(this);
   }
-
-
 
   parseAndCleanPath(path) {
     let parts = path.split(";");
@@ -210,6 +220,8 @@ export default class App extends Component {
   }
   componentDidMount() {
     this.detectContext();
+
+    this.loadProposals();
 
     console.log(
       "document.getElementsByClassName('className').style",
@@ -774,36 +786,128 @@ export default class App extends Component {
   }
 
   // VOLT Methods
-  openMenu(){
-    this.setState((state)=>({
+  openMenu() {
+    this.setState(state => ({
       ...state,
       isMenuOpen: true
-    }))
+    }));
   }
-  closeMenu(){
-    this.setState((state)=>({
+  closeMenu() {
+    this.setState(state => ({
       ...state,
       isMenuOpen: false
-    }))
+    }));
+  }
+  async loadProposals() {
+    const endpoint = "https://www.npoint.io/documents/217ecb17f01746799a3b";
+    const response = await fetch(endpoint);
+    const body = await response.json();
+    const {
+      proposals: proposalsList,
+      voteEndTime,
+      voteStartTime
+    } = body.contents;
+    this.setState(state => ({
+      ...state,
+      proposalsList,
+      sortedList: proposalsList,
+      filteredList: proposalsList,
+      filterQuery: "",
+      voteStartTime,
+      voteEndTime
+    }));
+  }
+
+  sort(param) {
+    const { filteredList } = this.state;
+    return () => {
+      console.log("Sort by:", param);
+    };
+  }
+
+  filterList(event) {
+    const query = event.target.value;
+    const { proposalsList, filteredList, filterQuery } = this.state;
+
+    const lcQuery = query.toLowerCase();
+    const searchList = lcQuery.includes(filterQuery)
+      ? filteredList
+      : proposalsList;
+
+    const newList = searchList.filter(proposal => {
+      const inTitle = contains(proposal, "title", lcQuery);
+      const inDescription = contains(proposal, "description", lcQuery);
+      const inId = contains(proposal, "proposalId", lcQuery);
+      return inTitle || inDescription || inId;
+    });
+
+    this.setState(state => ({
+      ...state,
+      filterQuery: query,
+      filteredList: newList
+    }));
+  }
+
+  resetFilter() {
+    const { proposalsList, filteredList, filterQuery } = this.state;
+    this.setState(state => ({
+      ...state,
+      filterQuery: "",
+      filteredList: proposalsList
+    }));
+  }
+
+  toggleFavorites(id) {
+    const { account, favorites } = this.state;
+    const value = !!favorites[id];
+    favorites[id] = !value;
+
+    storeValues({ favorites: JSON.stringify(favorites) }, account);
+
+    this.setState(state => ({
+      ...state,
+      favorites
+    }));
   }
 
   render() {
     const { creditsBalance, tokensBalance } = this.state;
     const { xdaiweb3, web3, account, metaAccount } = this.state;
-    const { isMenuOpen } = this.state;
+    const {
+      isMenuOpen,
+      sortedList,
+      filteredList,
+      filterQuery,
+      favorites
+    } = this.state;
     const web3props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
       <ThemeProvider theme={theme}>
         <I18nextProvider i18n={i18n}>
-          <MainContainer>
-            {isMenuOpen && <Menu onClose={this.closeMenu}/>}
-            <Header credits={creditsBalance} openMenu={this.openMenu}/>
-{/*            <VoteControls
+          {account ? (
+            <MainContainer>
+              {isMenuOpen && <Menu onClose={this.closeMenu} />}
+              <Header credits={creditsBalance} openMenu={this.openMenu} />
+              <FilterControls
+                filter={this.filterList}
+                query={filterQuery}
+                reset={this.resetFilter}
+              />
+              <SortContols sort={this.sort} />
+              <ProposalsList
+                list={filteredList}
+                toggle={this.toggleFavorites}
+                favorites={favorites}
+              />
+              {/*            <VoteControls
               proposalId={0}
               credits={creditsBalance}
               {...web3props}
             />*/}
-          </MainContainer>
+            </MainContainer>
+          ) : (
+            <p>Loading...</p>
+          )}
           <Dapparatus
             config={{
               DEBUG: false,
@@ -818,6 +922,16 @@ export default class App extends Component {
             xdaiProvider={CONFIG.SIDECHAIN.RPC}
             onUpdate={async state => {
               //console.log("DAPPARATUS UPDATE",state)
+
+              const { account, favorites } = state;
+              if (!favorites) {
+                const storedList = getStoredValue("favorites", account);
+                const favoritesList = storedList ? JSON.parse(storedList) : {};
+                this.setState(state => ({
+                  ...state,
+                  favorites: favoritesList
+                }));
+              }
 
               if (state.xdaiweb3) {
                 let voiceCreditsContract;
