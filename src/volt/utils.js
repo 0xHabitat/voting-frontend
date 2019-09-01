@@ -1,7 +1,12 @@
 import web3 from "web3";
-import { Output, Outpoint }  from "leap-core";
+import { Output, Outpoint } from "leap-core";
 import { voltConfig as VOLT_CONFIG } from "../volt/config";
 import { getId, getData } from "../services/plasma";
+
+export const contains = (proposal, field, query) => {
+  const fieldValue = proposal[field].toLowerCase();
+  return fieldValue.includes(query);
+};
 
 export const fetchBalanceCard = async (plasma, account) => {
   const { BALANCE_CARD_COLOR } = VOLT_CONFIG;
@@ -18,7 +23,7 @@ export const fetchBalanceCard = async (plasma, account) => {
 export const getUTXOs = async (plasma, account, color) => {
   console.log(`Fetch unspent for ${color}`);
   const utxos = await plasma.send("plasma_unspent", [account]);
-  console.log({utxos});
+  console.log({ utxos });
   return utxos
     .filter(utxo => utxo.output.color === parseInt(color))
     .map(utxo => {
