@@ -56,6 +56,7 @@ export const Hamburger = styled(Image).attrs(() => ({
   width: 32px;
   height: auto;
   background-color: transparent;
+  cursor: pointer;
 `;
 
 export const BalanceContainer = styled(Flex)`
