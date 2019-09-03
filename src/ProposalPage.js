@@ -1,48 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Flex, Box } from "rimble-ui";
-import yabbcode from 'ya-bbcode';
 
 import { Star, Back } from "./volt/components/Common";
 import VoteControls from "./volt/components/VoteControls";
 import { ActionButton } from "./volt/components/VoteControls/styles";
-
-
-const parser = new yabbcode();
-
-parser.registerTag('color', {
-  type: 'replace',
-  open: (attr) => {
-      return `<span style="color: ${attr}">`;
-  },
-  close: '</span>'
-});
-
-parser.registerTag('ol', {
-  type: 'replace',
-  open: '<ol>',
-  close: '</ol>'
-});
-
-parser.registerTag('ul', {
-  type: 'replace',
-  open: '<ul>',
-  close: '</ul>'
-});
-
-parser.registerTag('li', {
-  type: 'replace',
-  open: '<li>',
-  close: null
-});
-
-parser.registerTag('size', {
-  type: 'replace',
-  open: (attr) => {
-      return `<span>`;
-  },
-  close: '</span>'
-});
+import BB from './volt/components/BB';
 
 const VoteButton = styled(ActionButton)`
   width: auto;
@@ -123,7 +86,7 @@ export default class ProposalPage extends React.Component {
           <header>
             <h1>{proposal.title}</h1>
           </header>
-          <main dangerouslySetInnerHTML={{__html: parser.parse(proposal.description)}} />
+          <BB as="main">{proposal.description}</BB>
         </Content>
 
         <Footer as="footer">
