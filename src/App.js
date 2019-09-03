@@ -43,6 +43,7 @@ import ProposalsList from "./volt/components/ProposalsList";
 import SortContols from "./volt/components/SortControls";
 import FilterControls from "./volt/components/FilterControls";
 import Footer from "./volt/components/Footer";
+import proposals from "./volt/proposals";
 
 let LOADERIMAGE = burnerlogo;
 let HARDCODEVIEW; // = "loader"// = "receipt"
@@ -788,18 +789,39 @@ export default class App extends Component {
     const response = await fetch(endpoint);
     const body = await response.json();
     const {
-      proposals: proposalsList,
+      proposals,
       voteEndTime,
-      voteStartTime
+      voteStartTime,
+      trashAddress
     } = body.contents;
+
+    const proposalsList = proposals.map((proposal, i)=>{
+      return {
+        ...proposal,
+        _id: i
+      }
+    });
+
+    console.log({proposalsList})
+
+    const proposalsDictionary = proposalsList.reduce((acc,item)=>{
+      const {_id} = item;
+      acc[_id] = item;
+      return acc;
+    },{});
+
+    console.log({proposalsDictionary})
+
     this.setState(state => ({
       ...state,
       proposalsList,
+      proposalsDictionary,
       sortedList: proposalsList,
       filteredList: proposalsList,
       filterQuery: "",
       voteStartTime,
-      voteEndTime
+      voteEndTime,
+      trashBox: trashAddress
     }));
   }
 
@@ -863,9 +885,11 @@ export default class App extends Component {
       sortedList,
       filteredList,
       filterQuery,
-      favorites
+      favorites,
+      proposalsList,
+      proposalsDictionary
     } = this.state;
-    const { voteStartTime, voteEndTime } = this.state;
+    const { voteStartTime, voteEndTime, trashBox } = this.state;
     const web3props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
       <ThemeProvider theme={theme}>
@@ -885,7 +909,7 @@ export default class App extends Component {
                 toggle={this.toggleFavorites}
                 favorites={favorites}
               />
-              <Footer
+              {/*              <Footer
                 voteStartTime={voteStartTime}
                 voteEndTime={voteEndTime}
                 history={[
@@ -893,12 +917,15 @@ export default class App extends Component {
                   { id: "EA003", votes: 4 },
                   { id: "EA002", votes: 1 }
                 ]}
+              />*/}
+              <VoteControls
+                account={account}
+                proposals={proposalsDictionary}
+                trashBox={trashBox}
+                proposalId={0}
+                credits={creditsBalance}
+                {...web3props}
               />
-              {/*            <VoteControls
-              proposalId={0}
-              credits={creditsBalance}
-              {...web3props}
-            />*/}
             </MainContainer>
           ) : (
             <p>Loading...</p>
