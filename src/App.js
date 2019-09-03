@@ -34,13 +34,13 @@ import { voltConfig as VOLT_CONFIG } from "./volt/config";
 import { MainContainer } from "./volt/components/Common";
 import { Header } from "./volt/components/Header";
 import Menu from "./volt/components/Menu";
-import VoteControls from "./volt/components/VoteControls";
 import Progress from "./volt/components/Progress";
 import Receipt from "./volt/components/Receipt";
 import { fetchBalanceCard, votesToValue, contains } from "./volt/utils";
 import SMT from "./volt/lib/SparseMerkleTree";
 
 import MainPage from "./MainPage";
+import ProposalPage from "./ProposalPage";
 
 let LOADERIMAGE = burnerlogo;
 let HARDCODEVIEW; // = "loader"// = "receipt"
@@ -860,12 +860,13 @@ export default class App extends Component {
       isMenuOpen,
       sortedList,
       filteredList,
+      proposalsList,
       filterQuery,
       favorites
     } = this.state;
 
     const { voteStartTime, voteEndTime } = this.state;
-    const web3props = { plasma: xdaiweb3, web3, account, metaAccount };
+    const web3Props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
       <ThemeProvider theme={theme}>
         <I18nextProvider i18n={i18n}>
@@ -874,7 +875,19 @@ export default class App extends Component {
               {isMenuOpen && <Menu onClose={this.closeMenu} />}
               <Header credits={creditsBalance} openMenu={this.openMenu} />
 
-              <MainPage
+              {true &&
+                proposalsList &&
+                proposalsList[0] &&
+                <ProposalPage
+                  web3Props={web3Props}
+                  favorite={favorites[proposalsList[0].proposalId]}
+                  toggleFavorites={this.toggleFavorites}
+                  proposal={proposalsList[0]}
+                  goBack={this.goBack}
+                />
+              }
+
+              {false && <MainPage
                 proposalsList={filteredList}
                 filterList={this.filterList}
                 resetFilter={this.resetFilter}
@@ -884,13 +897,8 @@ export default class App extends Component {
                 favorites={favorites}
                 voteStartTime={voteStartTime}
                 voteEndTime={voteEndTime}
-              />
+              />}
 
-              {/*            <VoteControls
-              proposalId={0}
-              credits={creditsBalance}
-              {...web3props}
-            />*/}
             </MainContainer>
           ) : (
             <p>Loading...</p>
