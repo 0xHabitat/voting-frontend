@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Flex, Box } from "rimble-ui";
 
 import { Star, Back } from "./volt/components/Common";
+import { TopPart, Topic, ProposalId } from "./volt/components/ProposalsList/SingleProposal/styles";
 import VoteControls from "./volt/components/VoteControls";
 import { ActionButton } from "./volt/components/VoteControls/styles";
 import BB from './volt/components/BB';
@@ -32,6 +33,7 @@ export const Footer = styled(Flex).attrs(() => ({
   bottom: 0;
   z-index: 2; */
   flex-direction: column;
+  border-radius: 5px 5px 0 0;
 `;
 
 export const VoteFooter = styled(Flex).attrs(() => ({
@@ -84,6 +86,10 @@ export default class ProposalPage extends React.Component {
           </HeaderBar>
 
           <header>
+            <TopPart>
+              <ProposalId>{proposal.proposalId}</ProposalId>
+              <Topic>Smart state</Topic>
+            </TopPart>
             <h1>{proposal.title}</h1>
           </header>
           <BB as="main">{proposal.description}</BB>
