@@ -21,17 +21,13 @@ const SingleProposal = props => {
   return (
     <ProposalContainer>
       <VoteRecord votes={votes} />
-      <Link to={`/proposal/${proposalId}`}>
-      <VoteInfo>
+      <VoteInfo as={Link}  to={`/proposal/${proposalId}`}>
         <TopPart>
-
-            <ProposalId>{proposalId}</ProposalId>
-            <Topic>{topic}</Topic>
-
+          <ProposalId>{proposalId}</ProposalId>
+          <Topic>{topic}</Topic>
         </TopPart>
         <Title>{title}</Title>
       </VoteInfo>
-      </Link>
       <Star active={favorite} onClick={()=> toggle(proposalId)}/>
     </ProposalContainer>
   );
