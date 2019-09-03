@@ -3,11 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@bbob/preset-react": "^2.5.3",
-    "@bbob/react": "^2.5.3",
     "@tammo/react-iban": "0.0.2",
     "base64url": "^3.0.1",
-    "bbcode-parser": "^1.0.10",
     "bootstrap": "^4.1.3",
     "dapparatus": "leapdao/dapparatus#5591152",
     "eth-crypto": "^1.3.2",
