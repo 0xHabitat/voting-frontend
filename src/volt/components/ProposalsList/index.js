@@ -22,4 +22,4 @@ const ProposalsList = props => {
   );
 };
 
-export default ProposalsList;
+export default React.memo(ProposalsList);

@@ -3,16 +3,14 @@ import { Tx, Input, Output, Util } from "leap-core";
 import { Dapparatus } from "dapparatus";
 import { equal, bi } from "jsbi-utils";
 import Web3 from "web3";
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { I18nextProvider } from "react-i18next";
+import { Route } from 'react-router-dom';
 import i18n from "./i18n";
 import "./App.scss";
 
 import burnerlogo from "./assets/burnerwallet.png";
 
 import incogDetect from "./services/incogDetect.js";
-import { ThemeProvider } from "rimble-ui";
-import theme from "./theme";
+
 import getConfig from "./config";
 //https://github.com/lesnitsky/react-native-webview-messaging/blob/v1/examples/react-native/web/index.js
 import RNMessageChannel from "react-native-webview-messaging";
@@ -783,11 +781,12 @@ export default class App extends Component {
       voteEndTime,
       voteStartTime
     } = body.contents;
+    const proposals = proposalsList.filter(p => p.proposalId)
     this.setState(state => ({
       ...state,
-      proposalsList,
-      sortedList: proposalsList,
-      filteredList: proposalsList,
+      proposalsList: proposals,
+      sortedList: proposals,
+      filteredList: proposals,
       filterQuery: "",
       voteStartTime,
       voteEndTime
@@ -795,7 +794,6 @@ export default class App extends Component {
   }
 
   sort(param) {
-    const { filteredList } = this.state;
     return () => {
       console.log("Sort by:", param);
     };
@@ -825,7 +823,7 @@ export default class App extends Component {
   }
 
   resetFilter() {
-    const { proposalsList, filteredList, filterQuery } = this.state;
+    const { proposalsList } = this.state;
     this.setState(state => ({
       ...state,
       filterQuery: "",
@@ -847,11 +845,10 @@ export default class App extends Component {
   }
 
   render() {
-    const { creditsBalance, tokensBalance } = this.state;
+    const { creditsBalance } = this.state;
     const { xdaiweb3, web3, account, metaAccount } = this.state;
     const {
       isMenuOpen,
-      sortedList,
       filteredList,
       proposalsList,
       filterQuery,
@@ -861,14 +858,12 @@ export default class App extends Component {
     const { voteStartTime, voteEndTime } = this.state;
     const web3Props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
-      <ThemeProvider theme={theme}>
-        <I18nextProvider i18n={i18n}>
+      <>
           {account ? (
             <MainContainer>
               {isMenuOpen && <Menu onClose={this.closeMenu} />}
               <Header credits={creditsBalance} openMenu={this.openMenu} />
 
-              <Router>
                 <Route path="/" exact render={() => (
                   <MainPage
                     proposalsList={filteredList}
@@ -902,7 +897,6 @@ export default class App extends Component {
                     )
                   }
                 }} />
-              </Router>
             </MainContainer>
           ) : (
             <p>Loading...</p>
@@ -1061,8 +1055,7 @@ export default class App extends Component {
               }
             }}
           />
-        </I18nextProvider>
-      </ThemeProvider>
+      </>
     );
   }
 }
