@@ -39,10 +39,8 @@ import Progress from "./volt/components/Progress";
 import Receipt from "./volt/components/Receipt";
 import { fetchBalanceCard, votesToValue, contains } from "./volt/utils";
 import SMT from "./volt/lib/SparseMerkleTree";
-import ProposalsList from "./volt/components/ProposalsList";
-import SortContols from "./volt/components/SortControls";
-import FilterControls from "./volt/components/FilterControls";
-import Footer from "./volt/components/Footer";
+
+import MainPage from "./MainPage";
 
 let LOADERIMAGE = burnerlogo;
 let HARDCODEVIEW; // = "loader"// = "receipt"
@@ -865,6 +863,7 @@ export default class App extends Component {
       filterQuery,
       favorites
     } = this.state;
+
     const { voteStartTime, voteEndTime } = this.state;
     const web3props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
@@ -874,26 +873,19 @@ export default class App extends Component {
             <MainContainer>
               {isMenuOpen && <Menu onClose={this.closeMenu} />}
               <Header credits={creditsBalance} openMenu={this.openMenu} />
-              <FilterControls
-                filter={this.filterList}
-                query={filterQuery}
-                reset={this.resetFilter}
-              />
-              <SortContols sort={this.sort} />
-              <ProposalsList
-                list={filteredList}
-                toggle={this.toggleFavorites}
+
+              <MainPage
+                proposalsList={filteredList}
+                filterList={this.filterList}
+                resetFilter={this.resetFilter}
+                sort={this.sort}
+                toggleFavorites={this.toggleFavorites}
+                filterQuery={filterQuery}
                 favorites={favorites}
-              />
-              <Footer
                 voteStartTime={voteStartTime}
                 voteEndTime={voteEndTime}
-                history={[
-                  { id: "EA001", votes: 2 },
-                  { id: "EA003", votes: 4 },
-                  { id: "EA002", votes: 1 }
-                ]}
               />
+
               {/*            <VoteControls
               proposalId={0}
               credits={creditsBalance}
