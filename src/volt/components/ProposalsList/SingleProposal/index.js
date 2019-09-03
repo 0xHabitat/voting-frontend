@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 import { Star } from "../../Common";
 import VoteRecord from "../VoteRecord";
 import {
@@ -21,13 +22,17 @@ const SingleProposal = props => {
   return (
     <ProposalContainer>
       <VoteRecord votes={votes} />
+      <Link to={`/proposal/${proposalId}`}>
       <VoteInfo>
         <TopPart>
-          <ProposalId>{proposalId}</ProposalId>
-          <Topic>{topic}</Topic>
+
+            <ProposalId>{proposalId}</ProposalId>
+            <Topic>{topic}</Topic>
+
         </TopPart>
         <Title>{title}</Title>
       </VoteInfo>
+      </Link>
       <Star active={favorite} onClick={()=> toggle(proposalId)}/>
     </ProposalContainer>
   );

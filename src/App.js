@@ -1,17 +1,13 @@
 import React, { Component } from "react";
 import { Tx, Input, Output, Util } from "leap-core";
-import { Dapparatus, Transactions, Gas } from "dapparatus";
+import { Dapparatus } from "dapparatus";
 import { equal, bi } from "jsbi-utils";
 import Web3 from "web3";
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
 import "./App.scss";
 
-import History from "./components/History";
-import Advanced from "./components/Advanced";
-import RecentTransactions from "./components/RecentTransactions";
-
-import Loader from "./components/Loader";
 import burnerlogo from "./assets/burnerwallet.png";
 
 import incogDetect from "./services/incogDetect.js";
@@ -34,10 +30,7 @@ import { voltConfig as VOLT_CONFIG } from "./volt/config";
 import { MainContainer } from "./volt/components/Common";
 import { Header } from "./volt/components/Header";
 import Menu from "./volt/components/Menu";
-import Progress from "./volt/components/Progress";
-import Receipt from "./volt/components/Receipt";
 import { fetchBalanceCard, votesToValue, contains } from "./volt/utils";
-import SMT from "./volt/lib/SparseMerkleTree";
 
 import MainPage from "./MainPage";
 import ProposalPage from "./ProposalPage";
@@ -875,30 +868,41 @@ export default class App extends Component {
               {isMenuOpen && <Menu onClose={this.closeMenu} />}
               <Header credits={creditsBalance} openMenu={this.openMenu} />
 
-              {true &&
-                proposalsList &&
-                proposalsList[0] &&
-                <ProposalPage
-                  web3Props={web3Props}
-                  favorite={favorites[proposalsList[0].proposalId]}
-                  toggleFavorites={this.toggleFavorites}
-                  proposal={proposalsList[0]}
-                  goBack={this.goBack}
-                />
-              }
+              <Router>
+                <Route path="/" exact render={() => (
+                  <MainPage
+                    proposalsList={filteredList}
+                    filterList={this.filterList}
+                    resetFilter={this.resetFilter}
+                    sort={this.sort}
+                    toggleFavorites={this.toggleFavorites}
+                    filterQuery={filterQuery}
+                    favorites={favorites}
+                    voteStartTime={voteStartTime}
+                    voteEndTime={voteEndTime}
+                  />
+                )} />
 
-              {false && <MainPage
-                proposalsList={filteredList}
-                filterList={this.filterList}
-                resetFilter={this.resetFilter}
-                sort={this.sort}
-                toggleFavorites={this.toggleFavorites}
-                filterQuery={filterQuery}
-                favorites={favorites}
-                voteStartTime={voteStartTime}
-                voteEndTime={voteEndTime}
-              />}
-
+                <Route path="/proposal/:proposalId" render={({
+                  match: { params: { proposalId } },
+                  history
+                }) => {
+                  const proposal = (proposalsList || []).find(p => p.proposalId === proposalId);
+                  if (!proposal) {
+                    return 'Proposal not found';
+                  } else {
+                    return (
+                      <ProposalPage
+                        web3Props={web3Props}
+                        favorite={favorites[proposalId]}
+                        toggleFavorites={this.toggleFavorites}
+                        proposal={proposal}
+                        goBack={history.goBack}
+                      />
+                    )
+                  }
+                }} />
+              </Router>
             </MainContainer>
           ) : (
             <p>Loading...</p>
