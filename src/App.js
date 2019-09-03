@@ -892,6 +892,7 @@ export default class App extends Component {
                         favorite={favorites[proposalId]}
                         toggleFavorites={this.toggleFavorites}
                         proposal={proposal}
+                        creditsBalance={creditsBalance}
                         goBack={history.goBack}
                       />
                     )

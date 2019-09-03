@@ -17,7 +17,6 @@ import {
   StyledSlider,
   ActionButton
 } from "./styles";
-import proposals from "../../proposals";
 import { votesToValue, getUTXOs, toHex, padHex, replaceAll } from "../../utils";
 import { voltConfig } from "../../config";
 import { getData, getId } from "../../../services/plasma";
@@ -75,9 +74,9 @@ class VoteControls extends Component {
   }
 
   prepareScript() {
-    const { proposalId } = this.props;
-    const { yesBoxAddress, noBoxAddress } = proposals[proposalId];
-    const hexId = toHex(proposalId, 12);
+    const { proposal } = this.props;
+    const { yesBoxAddress, noBoxAddress } = proposal;
+    const hexId = toHex(proposal.proposalId, 12);
 
     // Bytecode templates
     const {
@@ -173,8 +172,7 @@ class VoteControls extends Component {
   }
 
   async getOutputs() {
-    const { account, proposalId } = this.props;
-    const proposal = proposals[proposalId];
+    const { account, proposal } = this.props;
     const { boothAddress } = proposal;
 
     // TODO: Parallelize with Promise.all([...promises])
