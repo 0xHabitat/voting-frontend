@@ -259,13 +259,19 @@ class VoteControls extends Component {
 
   async signVote(vote) {
     const { metaAccount, web3 } = this.props;
-    console.log(web3);
     if (metaAccount && metaAccount.privateKey) {
       // TODO: Check that this is working on mobile, where you don't have Metamask
-      vote.signAll(metaAccount.privateKey);
+      vote.sign([
+        undefined,
+        undefined,
+        metaAccount.privateKey,
+        metaAccount.privateKey,
+      ]);
     } else {
       await window.ethereum.enable();
-      await vote.signWeb3(web3);
+      const { r, s, v, signer } = await Tx.signMessageWithWeb3(web3, vote.sigData(), 0);
+      vote.inputs[2].setSig(r, s, v, signer);
+      vote.inputs[3].setSig(r, s, v, signer);
     }
   }
 
@@ -302,6 +308,7 @@ class VoteControls extends Component {
     // Sign and check vote
     await this.signVote(vote);
     const check = await this.checkVote(vote);
+    console.log({ check });
 
     // Update vote and sign again
     this.updateVoteOutputs(vote, check.outputs);
