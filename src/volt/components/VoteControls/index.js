@@ -2,11 +2,12 @@ import React, { Component } from "react";
 import Web3 from "web3";
 import { Tx, Input, Output, helpers } from "leap-core";
 import { providers, utils } from "ethers";
+import { bufferToHex } from "ethereumjs-util";
 import SMT from "../../lib/SparseMerkleTree";
 import { getStoredValue, storeValues } from "../../../services/localStorage";
 
 import votingBoothArtifact from "../../contracts/VotingBooth";
-import ballotBoxInterface from '../../contracts/ballotBox'
+import ballotBoxInterface from "../../contracts/ballotBox";
 
 import { Equation } from "./GridDisplay";
 import { Choice } from "./Choice";
@@ -52,6 +53,12 @@ class VoteControls extends Component {
     this.constructVote = this.constructVote.bind(this);
     this.signVote = this.signVote.bind(this);
     this.processVote = this.processVote.bind(this);
+
+    // Withdraw methods
+    this.prepareWithdrawScript = this.prepareWithdrawScript.bind(this);
+    this.getWithdrawOutputs = this.getWithdrawOutputs.bind(this);
+    this.cookWithdrawParams = this.cookWithdrawParams.bind(this);
+    this.signWithdraw = this.signWithdraw.bind(this);
 
     this.submitVote = this.submitVote.bind(this);
     this.withdrawVote = this.withdrawVote.bind(this);
@@ -149,6 +156,7 @@ class VoteControls extends Component {
     // Gas is always paid in Leap tokens (color = 0)
     const LEAP_COLOR = 0;
     const gasUTXOs = await getUTXOs(plasma, address, LEAP_COLOR);
+
     // TODO: Do we need to get several here?
     const gas = gasUTXOs[0];
     return {
@@ -176,7 +184,6 @@ class VoteControls extends Component {
     const { account, proposalId } = this.props;
     const proposal = proposals[proposalId];
     const { boothAddress } = proposal;
-
     // TODO: Parallelize with Promise.all([...promises])
     const gas = await this.getGas(boothAddress);
     const voteTokens = await this.getVoteTokens(boothAddress);
@@ -232,7 +239,7 @@ class VoteControls extends Component {
   }
 
   async constructVote(outputs, script, data) {
-    const { gas, voteTokens, balanceCard, voteCredits } = outputs;
+    const { gas, voteTokens, voteCredits, balanceCard } = outputs;
 
     const vote = Tx.spendCond(
       [
@@ -244,10 +251,10 @@ class VoteControls extends Component {
           prevout: voteTokens.unspent.outpoint
         }),
         new Input({
-          prevout: balanceCard.unspent.outpoint
+          prevout: voteCredits.unspent.outpoint
         }),
         new Input({
-          prevout: voteCredits.unspent.outpoint
+          prevout: balanceCard.unspent.outpoint
         })
       ],
       // Outputs is empty, cause it's hard to guess what it should be
@@ -269,6 +276,32 @@ class VoteControls extends Component {
       await window.ethereum.enable();
       await vote.signWeb3(web3);
     }
+  }
+
+  async signWithdraw(withdraw, balanceCard) {
+    const { account, metaAccount, web3 } = this.props;
+    console.log({ balanceCard });
+    /*/!*    await window.ethereum.enable();
+    await withdraw.signWeb3(web3);*!/
+
+/!*    const signParams = await web3.eth.sign(account, withdraw.inputs[3].hash);
+    console.log({signParams});*!/
+
+    await window.ethereum.enable();
+
+    const signParams = await Tx.signMessageWithWeb3(
+      web3,
+      balanceCard.unspent.outpoint.hash,
+      0
+    );
+    console.log({signParams});*/
+
+    const hexString = bufferToHex(Buffer.from(withdraw.inputs[3].prevout.hash));
+    const signParams = await Tx.signMessageWithWeb3(web3, hexString);
+    console.log({ signParams });
+
+    const { r, s, v, signer } = signParams;
+    withdraw.inputs[3].setSig(r, s, v, signer);
   }
 
   async checkVote(vote) {
@@ -321,9 +354,176 @@ class VoteControls extends Component {
     // TODO: Show receipt
   }
 
+  // WITHDRAW RELATED METHODS
+
+  prepareWithdrawScript() {
+    const { proposalId, trashBox } = this.props;
+    const { yesBoxAddress, noBoxAddress } = proposals[proposalId];
+    console.log({ yesBoxAddress, noBoxAddress });
+    const hexId = toHex(proposalId, 12);
+    const {
+      VOICE_CREDITS,
+      VOICE_TOKENS,
+      BALANCE_CARD,
+      TRASH_BOX,
+      PROPOSAL_ID,
+      IS_YES
+    } = ballotBoxInterface.template;
+
+    const {
+      CONTRACT_VOICE_CREDITS,
+      CONTRACT_VOICE_TOKENS,
+      CONTRACT_VOICE_BALANCE_CARD
+    } = voltConfig;
+
+    // TODO: Add selection here
+    const YES = "0x000000000001";
+    const NO = "0x000000000000";
+
+    // Construct new bytecode
+    let finalBytecode = replaceAll(
+      bytecode,
+      VOICE_CREDITS,
+      CONTRACT_VOICE_CREDITS
+    );
+    finalBytecode = replaceAll(
+      finalBytecode,
+      VOICE_TOKENS,
+      CONTRACT_VOICE_TOKENS
+    );
+    finalBytecode = replaceAll(
+      finalBytecode,
+      BALANCE_CARD,
+      CONTRACT_VOICE_BALANCE_CARD
+    );
+    finalBytecode = replaceAll(finalBytecode, TRASH_BOX, trashBox);
+    finalBytecode = replaceAll(finalBytecode, IS_YES, YES);
+    finalBytecode = replaceAll(finalBytecode, PROPOSAL_ID, hexId);
+    return Buffer.from(finalBytecode, "hex");
+  }
+
+  async getWithdrawOutputs() {
+    const { account, proposals, proposalId } = this.props;
+    const proposal = proposals[proposalId];
+    console.log({ proposal });
+
+    const { yesBoxAddress, noBoxAddress } = proposal;
+    // TODO: Check from what box we shall withdraw
+    const destBox = yesBoxAddress;
+
+    console.log({ destBox });
+
+    const gas = await this.getGas(destBox);
+    const voteTokens = await this.getVoteTokens(destBox);
+    const voteCredits = await this.getVoteCredits(destBox);
+    const balanceCard = await this.getBalanceCard(account);
+
+    return {
+      gas,
+      voteTokens,
+      balanceCard,
+      voteCredits
+    };
+  }
+
+  cookWithdrawParams(balanceCardId, votes) {
+    console.log("Cook withdraw params");
+    const { account, proposalId } = this.props;
+
+    let tree;
+    let castedVotes;
+
+    let localTree = getStoredValue("votes", account);
+    if (!localTree) {
+      // TODO: Need to throw error here in case local tree is absent
+      throw Error("Local tree is corrupted");
+    } else {
+      console.log({ localTree });
+      const parsedTree = JSON.parse(localTree);
+      console.log({ parsedTree });
+      tree = new SMT(9, parsedTree);
+      castedVotes = parsedTree[proposalId];
+      console.log({ castedVotes });
+      console.log("Tree root:", tree.root);
+    }
+
+    const current = utils.formatEther(castedVotes);
+    const amount = utils.parseEther(current);
+
+    console.log("Create merkle proof for proposal #", proposalId);
+    const proof = tree.createMerkleProof(proposalId);
+    const { abi } = ballotBoxInterface;
+    const contractInterface = new utils.Interface(abi);
+
+    return contractInterface.functions.withdraw.encode([
+      parseInt(balanceCardId),
+      proof,
+      amount,
+      amount
+    ]);
+  }
+
+  async constructWithdraw(outputs, script, data) {
+    const { gas, voteTokens, voteCredits, balanceCard } = outputs;
+    console.log({ outputs });
+    const inputs = [
+      new Input({
+        prevout: gas.unspent.outpoint,
+        script
+      }),
+      new Input({
+        prevout: voteTokens.unspent.outpoint
+      }),
+      new Input({
+        prevout: voteCredits.unspent.outpoint
+      }),
+      new Input({
+        prevout: balanceCard.unspent.outpoint
+      })
+    ];
+
+    console.log({ inputs });
+
+    const withdraw = Tx.spendCond(
+      inputs,
+      // Outputs is empty, cause it's hard to guess what it should be
+      []
+    );
+
+    withdraw.inputs[0].setMsgData(data);
+    return withdraw;
+  }
+
   async withdrawVote() {
     console.log("Display Progress Screen");
     this.setProgressState(true);
+
+    // WITHDRAW CODE HERE
+    const script = this.prepareWithdrawScript();
+    const outputs = await this.getWithdrawOutputs();
+    const { balanceCard } = outputs;
+
+    const data = this.cookWithdrawParams(balanceCard.id);
+    const withdraw = await this.constructWithdraw(outputs, script, data);
+
+    console.log({ withdraw });
+
+    //await this.signVote(withdraw);
+    await this.signWithdraw(withdraw, balanceCard);
+    const check = await this.checkVote(withdraw);
+
+    console.log({ check });
+
+    /*    // Update vote and sign again
+    this.updateVoteOutputs(withdraw, check.outputs);
+    await this.signVote(withdraw);
+    const secondCheck = await this.checkVote(withdraw);
+    console.log({ secondCheck });*/
+
+    this.setProgressState(false);
+
+    // TODO: Do we need to show receipt screen here?
+    // this.setReceiptState(true);
   }
 
   setProgressState(bool) {
@@ -378,10 +578,10 @@ class VoteControls extends Component {
       { value: "no", color: "voltBrandRed" }
     ];
     const disabled = votes < 1 || choice === "";
-    console.log(this.state);
+
     return (
       <Container>
-        {showProgress && <Progress />}
+        {showProgress && <Progress message={"Processing, please wait..."} />}
         {showReceipt && (
           <Receipt voteType={choice} votes={votes} onClose={this.resetState} />
         )}
@@ -405,9 +605,7 @@ class VoteControls extends Component {
         <ActionButton disabled={disabled} onClick={this.submitVote}>
           Send Vote
         </ActionButton>
-        <ActionButton onClick={this.withdrawVote}>
-          Withdraw
-        </ActionButton>
+        <ActionButton onClick={this.withdrawVote}>Withdraw</ActionButton>
       </Container>
     );
   }
