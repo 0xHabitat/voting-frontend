@@ -11,13 +11,10 @@ import {
 } from "./styles";
 
 const SingleProposal = props => {
-  //const { votes } = props;
   const { title, proposalId, toggle, favorite } = props;
-  // const { favorite } = props;
   const topic = "Smart State";
-    // Math.random() > 0.3 ? "yes" : Math.random() > 0.5 ? "no" : "empty";
-  const sign = Math.random() > 0.5 ? 1 : -1;
-  const votes = sign * Math.floor(Math.random() * 6);
+  const sign = 1
+  const votes = sign * 0;
   return (
     <ProposalContainer>
       <VoteRecord votes={votes} />
