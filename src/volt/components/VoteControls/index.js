@@ -222,7 +222,7 @@ class VoteControls extends Component {
     const contractInterface = new utils.Interface(abi);
 
     return contractInterface.functions.castBallot.encode([
-      parseInt(balanceCardId),
+      parseInt(balanceCardId, 10),
       proof,
       prevNumOfVotes, // previous value
       newNumOfVotes // how much added
@@ -279,12 +279,6 @@ class VoteControls extends Component {
     return await plasma.send("checkSpendingCondition", [vote.hex()]);
   }
 
-  async updateVoteOutputs(vote, correctOutputs) {
-    for (let i = 0; i < correctOutputs.length; i++) {
-      vote.outputs[i] = new Output.fromJSON(correctOutputs[i]);
-    }
-  }
-
   async processVote(vote) {
     const plasmaWeb3 = helpers.extendWeb3(new Web3(RPC));
     const receipt = await plasmaWeb3.eth.sendSignedTransaction(vote.hex());
@@ -310,8 +304,12 @@ class VoteControls extends Component {
     const check = await this.checkVote(vote);
     console.log({ check });
 
+    if (check.error) {
+      throw new Error(`Check error: ${check.error}`);
+    }
+
     // Update vote and sign again
-    this.updateVoteOutputs(vote, check.outputs);
+    vote.outputs = check.outputs.map(Output.fromJSON);
     await this.signVote(vote);
     const secondCheck = await this.checkVote(vote);
     console.log({ secondCheck });
