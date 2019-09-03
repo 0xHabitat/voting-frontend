@@ -893,7 +893,7 @@ export default class App extends Component {
                         toggleFavorites={this.toggleFavorites}
                         proposal={proposal}
                         creditsBalance={creditsBalance}
-                        goBack={history.goBack}
+                        goBack={() => history.replace('/')}
                       />
                     )
                   }
