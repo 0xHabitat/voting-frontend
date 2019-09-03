@@ -33,4 +33,4 @@ const SingleProposal = props => {
   );
 };
 
-export default SingleProposal;
+export default React.memo(SingleProposal);
