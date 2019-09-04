@@ -2,6 +2,12 @@ import web3 from "web3";
 import { Output, Outpoint } from "leap-core";
 import { voltConfig as VOLT_CONFIG } from "../volt/config";
 import { getId, getData } from "../services/plasma";
+import {
+  hashPersonalMessage,
+  bufferToHex,
+  ecsign,
+  privateToAddress
+} from "ethereumjs-util";
 
 export const contains = (proposal, field, query) => {
   const fieldValue = proposal[field].toLowerCase();
@@ -22,10 +28,10 @@ export const fetchBalanceCard = async (plasma, account) => {
 };
 export const getUTXOs = async (plasma, account, color) => {
   console.log(`Fetch unspent for ${color}`);
-  const utxos = await plasma.send("plasma_unspent", [account]);
+  const utxos = await plasma.send("plasma_unspent", [account, color]);
   console.log({ utxos });
   return utxos
-    .filter(utxo => utxo.output.color === parseInt(color))
+    //.filter(utxo => utxo.output.color === parseInt(color))
     .map(utxo => {
       return {
         outpoint: Outpoint.fromRaw(utxo.outpoint),
@@ -61,4 +67,18 @@ export const votesToValue = voteNum => {
     hex: toHex(voteCredits, 64),
     string: voteCredits
   };
+};
+
+export const signMatching = (transaction, privateKey) => {
+  const addressFromPrivate = privateToAddress(privateKey);
+  const address = bufferToHex(addressFromPrivate);
+  const privateKeyBuffer = Buffer.from(privateKey.replace("0x", ""), "hex");
+  for (let input of transaction.inputs) {
+    if (address === input.address) {
+      const sigHashBuf = hashPersonalMessage(transaction.sigDataBuf());
+      const sig = ecsign(sigHashBuf, privateKeyBuffer);
+      input.setSig(sig.r, sig.s, sig.v, address);
+    }
+  }
+  return transaction;
 };

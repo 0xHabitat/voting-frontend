@@ -810,7 +810,7 @@ export default class App extends Component {
       return acc;
     },{});
 
-    console.log({proposalsDictionary})
+    console.log({proposalsDictionary});
 
     this.setState(state => ({
       ...state,
@@ -904,11 +904,11 @@ export default class App extends Component {
                 reset={this.resetFilter}
               />
               <SortContols sort={this.sort} />
-              <ProposalsList
+{/*              <ProposalsList
                 list={filteredList}
                 toggle={this.toggleFavorites}
                 favorites={favorites}
-              />
+              />*/}
               {/*              <Footer
                 voteStartTime={voteStartTime}
                 voteEndTime={voteEndTime}
@@ -946,6 +946,9 @@ export default class App extends Component {
               //console.log("DAPPARATUS UPDATE",state)
 
               const { account, favorites } = state;
+
+              console.log('ACCOUNT ADDRESS:', account);
+
               if (!favorites) {
                 const storedList = getStoredValue("favorites", account);
                 const favoritesList = storedList ? JSON.parse(storedList) : {};
