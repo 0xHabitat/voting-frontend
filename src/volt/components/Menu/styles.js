@@ -42,6 +42,10 @@ export const Address = styled(Text).attrs(() => ({
   color: "voltBrandWhite",
 }))`
   font-weight: bold;
-  user-select: text;
   font-size: 3.5vw;
+  user-select: text;
+  &::selection{
+    background-color: ${({theme}) => theme.colors.voltBrandWhite};
+    color: ${({theme}) => theme.colors.voltBrandMain};
+  }
 `;
