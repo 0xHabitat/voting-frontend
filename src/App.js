@@ -771,6 +771,7 @@ export default class App extends Component {
       voteEndTime,
       voteStartTime
     } = body.contents;
+    // ToDo: remove second filter when store won't have any duplicate proposalId
     const proposals = proposalsList.filter(p => p.proposalId).filter((p, i, list) => list.findIndex(p2 => p2.proposalId === p.proposalId) === i);
     this.setState({
       proposalsList: proposals,
