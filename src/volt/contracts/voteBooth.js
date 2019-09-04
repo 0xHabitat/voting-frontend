@@ -59,3 +59,9 @@ export const abi = [
     type: "function"
   }
 ];
+
+export default {
+  bytecode,
+  template,
+  abi
+}
