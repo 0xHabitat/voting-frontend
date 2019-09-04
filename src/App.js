@@ -859,203 +859,203 @@ export default class App extends Component {
     const web3Props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
       <>
-          {account ? (
-            <MainContainer>
-              {isMenuOpen && <Menu onClose={this.closeMenu} />}
-              <Header credits={creditsBalance} openMenu={this.openMenu} />
+        {account ? (
+          <MainContainer>
+            {isMenuOpen && <Menu onClose={this.closeMenu} account={account} />}
+            <Header credits={creditsBalance} openMenu={this.openMenu} />
 
-                <Route path="/" exact render={() => (
-                  <MainPage
-                    proposalsList={filteredList}
-                    filterList={this.filterList}
-                    resetFilter={this.resetFilter}
-                    sort={this.sort}
-                    toggleFavorites={this.toggleFavorites}
-                    filterQuery={filterQuery}
-                    favorites={favorites}
-                    voteStartTime={voteStartTime}
-                    voteEndTime={voteEndTime}
-                  />
-                )} />
+              <Route path="/" exact render={() => (
+                <MainPage
+                  proposalsList={filteredList}
+                  filterList={this.filterList}
+                  resetFilter={this.resetFilter}
+                  sort={this.sort}
+                  toggleFavorites={this.toggleFavorites}
+                  filterQuery={filterQuery}
+                  favorites={favorites}
+                  voteStartTime={voteStartTime}
+                  voteEndTime={voteEndTime}
+                />
+              )} />
 
-                <Route path="/proposal/:proposalId" render={({
-                  match: { params: { proposalId } },
-                  history
-                }) => {
-                  const proposal = (proposalsList || []).find(p => p.proposalId === proposalId);
-                  if (!proposal) {
-                    return 'Proposal not found';
-                  } else {
-                    return (
-                      <ProposalPage
-                        web3Props={web3Props}
-                        favorite={favorites[proposalId]}
-                        toggleFavorites={this.toggleFavorites}
-                        proposal={proposal}
-                        creditsBalance={creditsBalance}
-                        goBack={() => history.replace('/')}
-                      />
-                    )
-                  }
-                }} />
-            </MainContainer>
-          ) : (
-            <p>Loading...</p>
-          )}
-          <Dapparatus
-            config={{
-              DEBUG: false,
-              hide: true,
-              requiredNetwork: ["Unknown", "xDai"],
-              metatxAccountGenerator: false
-            }}
-            //used to pass a private key into Dapparatus
-            newPrivateKey={this.state.newPrivateKey}
-            fallbackWeb3Provider={CONFIG.ROOTCHAIN.RPC}
-            network="LeapTestnet"
-            xdaiProvider={CONFIG.SIDECHAIN.RPC}
-            onUpdate={async state => {
-              //console.log("DAPPARATUS UPDATE",state)
-
-              const { account, favorites } = state;
-              if (!favorites) {
-                const storedList = getStoredValue("favorites", account);
-                const favoritesList = storedList ? JSON.parse(storedList) : {};
-                this.setState(state => ({
-                  ...state,
-                  favorites: favoritesList
-                }));
-              }
-
-              if (state.xdaiweb3) {
-                let voiceCreditsContract;
-                let voiceTokensContract;
-                const StableABI = require("./contracts/StableCoin.abi.js");
-                try {
-                  voiceCreditsContract = new state.xdaiweb3.eth.Contract(
-                    StableABI,
-                    VOLT_CONFIG.CONTRACT_VOICE_CREDITS
-                  );
-                  voiceTokensContract = new state.xdaiweb3.eth.Contract(
-                    StableABI,
-                    VOLT_CONFIG.CONTRACT_VOICE_TOKENS
-                  );
-                } catch (err) {
-                  console.log("Error loading contracts");
+              <Route path="/proposal/:proposalId" render={({
+                match: { params: { proposalId } },
+                history
+              }) => {
+                const proposal = (proposalsList || []).find(p => p.proposalId === proposalId);
+                if (!proposal) {
+                  return 'Proposal not found';
+                } else {
+                  return (
+                    <ProposalPage
+                      web3Props={web3Props}
+                      favorite={favorites[proposalId]}
+                      toggleFavorites={this.toggleFavorites}
+                      proposal={proposal}
+                      creditsBalance={creditsBalance}
+                      goBack={() => history.replace('/')}
+                    />
+                  )
                 }
-                this.setState({
-                  voiceTokensContract,
-                  voiceCreditsContract
-                });
+              }} />
+          </MainContainer>
+        ) : (
+          <p>Loading...</p>
+        )}
+        <Dapparatus
+          config={{
+            DEBUG: false,
+            hide: true,
+            requiredNetwork: ["Unknown", "xDai"],
+            metatxAccountGenerator: false
+          }}
+          //used to pass a private key into Dapparatus
+          newPrivateKey={this.state.newPrivateKey}
+          fallbackWeb3Provider={CONFIG.ROOTCHAIN.RPC}
+          network="LeapTestnet"
+          xdaiProvider={CONFIG.SIDECHAIN.RPC}
+          onUpdate={async state => {
+            //console.log("DAPPARATUS UPDATE",state)
+
+            const { account, favorites } = state;
+            if (!favorites) {
+              const storedList = getStoredValue("favorites", account);
+              const favoritesList = storedList ? JSON.parse(storedList) : {};
+              this.setState(state => ({
+                ...state,
+                favorites: favoritesList
+              }));
+            }
+
+            if (state.xdaiweb3) {
+              let voiceCreditsContract;
+              let voiceTokensContract;
+              const StableABI = require("./contracts/StableCoin.abi.js");
+              try {
+                voiceCreditsContract = new state.xdaiweb3.eth.Contract(
+                  StableABI,
+                  VOLT_CONFIG.CONTRACT_VOICE_CREDITS
+                );
+                voiceTokensContract = new state.xdaiweb3.eth.Contract(
+                  StableABI,
+                  VOLT_CONFIG.CONTRACT_VOICE_TOKENS
+                );
+              } catch (err) {
+                console.log("Error loading contracts");
               }
-              if (state.web3Provider) {
-                state.web3 = new Web3(state.web3Provider);
-                this.setState(state, () => {
-                  //console.log("state set:",this.state)
-                  if (this.state.possibleNewPrivateKey) {
-                    this.dealWithPossibleNewPrivateKey();
-                  }
-                  if (!this.state.parsingTheChain) {
-                    this.setState({ parsingTheChain: true }, async () => {
-                      let upperBoundOfSearch = this.state.block;
-                      //parse through recent transactions and store in local storage
-                      let initResult = this.initRecentTxs();
-                      let recentTxs = initResult[0];
-                      let transactionsByAddress = initResult[1];
-                      let loadedBlocksTop = this.state.loadedBlocksTop;
-                      if (!loadedBlocksTop) {
-                        loadedBlocksTop = getStoredValue(
-                          "loadedBlocksTop",
-                          this.state.account
-                        );
-                      }
-                      //  Look back through previous blocks since this account
-                      //  was last online... this could be bad. We might need a
-                      //  central server keeping track of all these and delivering
-                      //  a list of recent transactions
-                      let updatedTxs = false;
+              this.setState({
+                voiceTokensContract,
+                voiceCreditsContract
+              });
+            }
+            if (state.web3Provider) {
+              state.web3 = new Web3(state.web3Provider);
+              this.setState(state, () => {
+                //console.log("state set:",this.state)
+                if (this.state.possibleNewPrivateKey) {
+                  this.dealWithPossibleNewPrivateKey();
+                }
+                if (!this.state.parsingTheChain) {
+                  this.setState({ parsingTheChain: true }, async () => {
+                    let upperBoundOfSearch = this.state.block;
+                    //parse through recent transactions and store in local storage
+                    let initResult = this.initRecentTxs();
+                    let recentTxs = initResult[0];
+                    let transactionsByAddress = initResult[1];
+                    let loadedBlocksTop = this.state.loadedBlocksTop;
+                    if (!loadedBlocksTop) {
+                      loadedBlocksTop = getStoredValue(
+                        "loadedBlocksTop",
+                        this.state.account
+                      );
+                    }
+                    //  Look back through previous blocks since this account
+                    //  was last online... this could be bad. We might need a
+                    //  central server keeping track of all these and delivering
+                    //  a list of recent transactions
+                    let updatedTxs = false;
+                    if (
+                      !loadedBlocksTop ||
+                      loadedBlocksTop < this.state.block
+                    ) {
+                      if (!loadedBlocksTop)
+                        loadedBlocksTop = Math.max(2, this.state.block - 5);
                       if (
-                        !loadedBlocksTop ||
-                        loadedBlocksTop < this.state.block
+                        this.state.block - loadedBlocksTop >
+                        MAX_BLOCK_TO_LOOK_BACK
                       ) {
-                        if (!loadedBlocksTop)
-                          loadedBlocksTop = Math.max(2, this.state.block - 5);
-                        if (
-                          this.state.block - loadedBlocksTop >
-                          MAX_BLOCK_TO_LOOK_BACK
-                        ) {
-                          loadedBlocksTop =
-                            this.state.block - MAX_BLOCK_TO_LOOK_BACK;
-                        }
-                        let paddedLoadedBlocks =
-                          parseInt(loadedBlocksTop) +
-                          BLOCKS_TO_PARSE_PER_BLOCKTIME;
-                        //console.log("choosing the min of ",paddedLoadedBlocks,"and",this.state.block)
-                        let parseBlock = Math.min(
-                          paddedLoadedBlocks,
+                        loadedBlocksTop =
+                          this.state.block - MAX_BLOCK_TO_LOOK_BACK;
+                      }
+                      let paddedLoadedBlocks =
+                        parseInt(loadedBlocksTop) +
+                        BLOCKS_TO_PARSE_PER_BLOCKTIME;
+                      //console.log("choosing the min of ",paddedLoadedBlocks,"and",this.state.block)
+                      let parseBlock = Math.min(
+                        paddedLoadedBlocks,
+                        this.state.block
+                      );
+                      //console.log("MIN:",parseBlock)
+                      upperBoundOfSearch = parseBlock;
+                      console.log(
+                        " +++++++======== Parsing recent blocks ~" +
                           this.state.block
-                        );
-                        //console.log("MIN:",parseBlock)
-                        upperBoundOfSearch = parseBlock;
-                        console.log(
-                          " +++++++======== Parsing recent blocks ~" +
-                            this.state.block
-                        );
-                        //first, if we are still back parsing, we need to look at *this* block too
-                        if (upperBoundOfSearch < this.state.block) {
-                          for (
-                            let b = this.state.block;
-                            b > this.state.block - 6;
-                            b--
-                          ) {
-                            //console.log(" ++ Parsing *CURRENT BLOCK* Block "+b+" for transactions...")
-                            updatedTxs =
-                              (await this.parseBlocks(
-                                b,
-                                recentTxs,
-                                transactionsByAddress
-                              )) || updatedTxs;
-                          }
-                        }
-                        console.log(
-                          " +++++++======== Parsing from " +
-                            loadedBlocksTop +
-                            " to " +
-                            upperBoundOfSearch +
-                            "...."
-                        );
-                        while (loadedBlocksTop < parseBlock) {
-                          //console.log(" ++ Parsing Block "+parseBlock+" for transactions...")
+                      );
+                      //first, if we are still back parsing, we need to look at *this* block too
+                      if (upperBoundOfSearch < this.state.block) {
+                        for (
+                          let b = this.state.block;
+                          b > this.state.block - 6;
+                          b--
+                        ) {
+                          //console.log(" ++ Parsing *CURRENT BLOCK* Block "+b+" for transactions...")
                           updatedTxs =
                             (await this.parseBlocks(
-                              parseBlock,
+                              b,
                               recentTxs,
                               transactionsByAddress
                             )) || updatedTxs;
-                          parseBlock--;
                         }
                       }
-                      if (updatedTxs || !this.state.recentTxs) {
-                        this.sortAndSaveTransactions(
-                          recentTxs,
-                          transactionsByAddress
-                        );
-                      }
-                      storeValues(
-                        { loadedBlocksTop: upperBoundOfSearch },
-                        this.state.account
+                      console.log(
+                        " +++++++======== Parsing from " +
+                          loadedBlocksTop +
+                          " to " +
+                          upperBoundOfSearch +
+                          "...."
                       );
-                      this.setState({
-                        parsingTheChain: false,
-                        loadedBlocksTop: upperBoundOfSearch
-                      });
-                      //console.log("~~ DONE PARSING SET ~~")
+                      while (loadedBlocksTop < parseBlock) {
+                        //console.log(" ++ Parsing Block "+parseBlock+" for transactions...")
+                        updatedTxs =
+                          (await this.parseBlocks(
+                            parseBlock,
+                            recentTxs,
+                            transactionsByAddress
+                          )) || updatedTxs;
+                        parseBlock--;
+                      }
+                    }
+                    if (updatedTxs || !this.state.recentTxs) {
+                      this.sortAndSaveTransactions(
+                        recentTxs,
+                        transactionsByAddress
+                      );
+                    }
+                    storeValues(
+                      { loadedBlocksTop: upperBoundOfSearch },
+                      this.state.account
+                    );
+                    this.setState({
+                      parsingTheChain: false,
+                      loadedBlocksTop: upperBoundOfSearch
                     });
-                  }
-                });
-              }
-            }}
-          />
+                    //console.log("~~ DONE PARSING SET ~~")
+                  });
+                }
+              });
+            }
+          }}
+        />
       </>
     );
   }
