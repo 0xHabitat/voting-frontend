@@ -200,6 +200,7 @@ class VoteControls extends Component {
   }
 
   async getOutputs() {
+    const { account, proposal } = this.props;
     const { account, proposals, proposalId } = this.props;
     const proposal = proposals[proposalId];
     const { boothAddress } = proposal;
@@ -275,7 +276,7 @@ class VoteControls extends Component {
     const contractInterface = new utils.Interface(abi);
 
     return contractInterface.functions.castBallot.encode([
-      parseInt(balanceCardId),
+      parseInt(balanceCardId, 10),
       proof,
       prevVotes, // previous value
       newVotes // how much added
@@ -326,7 +327,9 @@ class VoteControls extends Component {
       vote.sign(privateKeys);
     } else {
       await window.ethereum.enable();
-      await vote.signWeb3(web3);
+      const { r, s, v, signer } = await Tx.signMessageWithWeb3(web3, vote.sigData(), 0);
+      vote.inputs[2].setSig(r, s, v, signer);
+      vote.inputs[3].setSig(r, s, v, signer);
     }
   }
 
@@ -404,6 +407,13 @@ class VoteControls extends Component {
 
     // Sign and check vote
 
+    if (check.error) {
+      throw new Error(`Check error: ${check.error}`);
+    }
+
+    // Update vote and sign again
+    await this.signVote(vote);
+    const secondCheck = await this.checkVote(vote);
     const { voteCredits } = outputs;
 
     const privateOutputs = voteCredits.unspent.length;

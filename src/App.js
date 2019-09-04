@@ -1,22 +1,16 @@
 import React, { Component } from "react";
 import { Tx, Input, Output, Util } from "leap-core";
-import { Dapparatus, Transactions, Gas } from "dapparatus";
+import { Dapparatus } from "dapparatus";
 import { equal, bi } from "jsbi-utils";
 import Web3 from "web3";
-import { I18nextProvider } from "react-i18next";
+import { Route } from 'react-router-dom';
 import i18n from "./i18n";
 import "./App.scss";
 
-import History from "./components/History";
-import Advanced from "./components/Advanced";
-import RecentTransactions from "./components/RecentTransactions";
-
-import Loader from "./components/Loader";
 import burnerlogo from "./assets/burnerwallet.png";
 
 import incogDetect from "./services/incogDetect.js";
-import { ThemeProvider } from "rimble-ui";
-import theme from "./theme";
+
 import getConfig from "./config";
 //https://github.com/lesnitsky/react-native-webview-messaging/blob/v1/examples/react-native/web/index.js
 import RNMessageChannel from "react-native-webview-messaging";
@@ -34,16 +28,10 @@ import { voltConfig as VOLT_CONFIG } from "./volt/config";
 import { MainContainer } from "./volt/components/Common";
 import { Header } from "./volt/components/Header";
 import Menu from "./volt/components/Menu";
-import VoteControls from "./volt/components/VoteControls";
-import Progress from "./volt/components/Progress";
-import Receipt from "./volt/components/Receipt";
 import { fetchBalanceCard, votesToValue, contains } from "./volt/utils";
-import SMT from "./volt/lib/SparseMerkleTree";
-import ProposalsList from "./volt/components/ProposalsList";
-import SortContols from "./volt/components/SortControls";
-import FilterControls from "./volt/components/FilterControls";
-import Footer from "./volt/components/Footer";
-import proposals from "./volt/proposals";
+
+import MainPage from "./MainPage";
+import ProposalPage from "./ProposalPage";
 
 let LOADERIMAGE = burnerlogo;
 let HARDCODEVIEW; // = "loader"// = "receipt"
@@ -794,30 +782,12 @@ export default class App extends Component {
       voteStartTime,
       trashAddress
     } = body.contents;
-
-    const proposalsList = proposals.map((proposal, i)=>{
-      return {
-        ...proposal,
-        _id: i
-      }
-    });
-
-    console.log({proposalsList})
-
-    const proposalsDictionary = proposalsList.reduce((acc,item)=>{
-      const {_id} = item;
-      acc[_id] = item;
-      return acc;
-    },{});
-
-    console.log({proposalsDictionary});
-
+    const proposals = proposalsList.filter(p => p.proposalId)
     this.setState(state => ({
       ...state,
-      proposalsList,
-      proposalsDictionary,
-      sortedList: proposalsList,
-      filteredList: proposalsList,
+      proposalsList: proposals,
+      sortedList: proposals,
+      filteredList: proposals,
       filterQuery: "",
       voteStartTime,
       voteEndTime,
@@ -826,7 +796,6 @@ export default class App extends Component {
   }
 
   sort(param) {
-    const { filteredList } = this.state;
     return () => {
       console.log("Sort by:", param);
     };
@@ -856,7 +825,7 @@ export default class App extends Component {
   }
 
   resetFilter() {
-    const { proposalsList, filteredList, filterQuery } = this.state;
+    const { proposalsList } = this.state;
     this.setState(state => ({
       ...state,
       filterQuery: "",
@@ -878,54 +847,62 @@ export default class App extends Component {
   }
 
   render() {
-    const { creditsBalance, tokensBalance } = this.state;
+    const { creditsBalance } = this.state;
     const { xdaiweb3, web3, account, metaAccount } = this.state;
     const {
       isMenuOpen,
-      sortedList,
       filteredList,
+      proposalsList,
       filterQuery,
       favorites,
       proposalsList,
       proposalsDictionary
     } = this.state;
     const { voteStartTime, voteEndTime, trashBox } = this.state;
-    const web3props = { plasma: xdaiweb3, web3, account, metaAccount };
+
+    const { voteStartTime, voteEndTime } = this.state;
+    const web3Props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
-      <ThemeProvider theme={theme}>
-        <I18nextProvider i18n={i18n}>
+      <>
           {account ? (
             <MainContainer>
-              {isMenuOpen && <Menu onClose={this.closeMenu} />}
+              {isMenuOpen && <Menu onClose={this.closeMenu} account={account} />}
               <Header credits={creditsBalance} openMenu={this.openMenu} />
-              <FilterControls
-                filter={this.filterList}
-                query={filterQuery}
-                reset={this.resetFilter}
-              />
-              <SortContols sort={this.sort} />
-{/*              <ProposalsList
-                list={filteredList}
-                toggle={this.toggleFavorites}
-                favorites={favorites}
-              />*/}
-              {/*              <Footer
-                voteStartTime={voteStartTime}
-                voteEndTime={voteEndTime}
-                history={[
-                  { id: "EA001", votes: 2 },
-                  { id: "EA003", votes: 4 },
-                  { id: "EA002", votes: 1 }
-                ]}
-              />*/}
-              <VoteControls
-                account={account}
-                proposals={proposalsDictionary}
-                trashBox={trashBox}
-                proposalId={0}
-                credits={creditsBalance}
-                {...web3props}
-              />
+
+                <Route path="/" exact render={() => (
+                  <MainPage
+                    proposalsList={filteredList}
+                    filterList={this.filterList}
+                    resetFilter={this.resetFilter}
+                    sort={this.sort}
+                    toggleFavorites={this.toggleFavorites}
+                    filterQuery={filterQuery}
+                    favorites={favorites}
+                    voteStartTime={voteStartTime}
+                    voteEndTime={voteEndTime}
+                  />
+                )} />
+
+                <Route path="/proposal/:proposalId" render={({
+                  match: { params: { proposalId } },
+                  history
+                }) => {
+                  const proposal = (proposalsList || []).find(p => p.proposalId === proposalId);
+                  if (!proposal) {
+                    return 'Proposal not found';
+                  } else {
+                    return (
+                      <ProposalPage
+                        web3Props={web3Props}
+                        favorite={favorites[proposalId]}
+                        toggleFavorites={this.toggleFavorites}
+                        proposal={proposal}
+                        creditsBalance={creditsBalance}
+                        goBack={() => history.replace('/')}
+                      />
+                    )
+                  }
+                }} />
             </MainContainer>
           ) : (
             <p>Loading...</p>
@@ -1039,7 +1016,6 @@ export default class App extends Component {
                             b > this.state.block - 6;
                             b--
                           ) {
-                            //console.log(" ++ Parsing *CURRENT BLOCK* Block "+b+" for transactions...")
                             updatedTxs =
                               (await this.parseBlocks(
                                 b,
@@ -1080,15 +1056,13 @@ export default class App extends Component {
                         parsingTheChain: false,
                         loadedBlocksTop: upperBoundOfSearch
                       });
-                      //console.log("~~ DONE PARSING SET ~~")
                     });
                   }
                 });
               }
             }}
           />
-        </I18nextProvider>
-      </ThemeProvider>
+      </>
     );
   }
 }

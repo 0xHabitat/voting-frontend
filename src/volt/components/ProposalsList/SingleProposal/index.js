@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 import { Star } from "../../Common";
 import VoteRecord from "../VoteRecord";
 import {
@@ -13,12 +14,11 @@ import {
 const SingleProposal = props => {
   const { title, proposalId, toggle, favorite } = props;
   const topic = "Smart State";
-  const sign = 1
-  const votes = sign * 0;
+  const votes = 0;
   return (
     <ProposalContainer>
       <VoteRecord votes={votes} />
-      <VoteInfo>
+      <VoteInfo as={Link}  to={`/proposal/${proposalId}`}>
         <TopPart>
           <ProposalId>{proposalId}</ProposalId>
           <Topic>{topic}</Topic>
@@ -30,4 +30,4 @@ const SingleProposal = props => {
   );
 };
 
-export default SingleProposal;
+export default React.memo(SingleProposal);
