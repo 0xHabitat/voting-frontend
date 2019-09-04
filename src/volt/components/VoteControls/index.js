@@ -2,11 +2,10 @@ import React, { Component } from "react";
 import Web3 from "web3";
 import { Tx, Input, Output, helpers } from "leap-core";
 import { providers, utils } from "ethers";
-import { bufferToHex } from "ethereumjs-util";
 import SMT from "../../lib/SparseMerkleTree";
 import { getStoredValue, storeValues } from "../../../services/localStorage";
 
-import votingBoothArtifact from "../../contracts/VotingBooth";
+import voteBoothInterface from "../../contracts/voteBooth";
 import ballotBoxInterface from "../../contracts/ballotBox";
 
 import { Equation } from "./GridDisplay";
@@ -18,20 +17,17 @@ import {
   StyledSlider,
   ActionButton
 } from "./styles";
-import proposals from "../../proposals";
+
 import {
-  votesToValue,
   getUTXOs,
   toHex,
   padHex,
   replaceAll,
-  signMatching,
-  pad
+
 } from "../../utils";
 import { voltConfig } from "../../config";
-import { getData, getId } from "../../../services/plasma";
+import { getId } from "../../../services/plasma";
 import Progress from "../Progress";
-import { bytecode, template } from "../../contracts/voteBooth";
 import Receipt from "../Receipt";
 
 const RPC = "https://testnet-node1.leapdao.org";
@@ -55,7 +51,7 @@ class VoteControls extends Component {
     this.cookVoteParams = this.cookVoteParams.bind(this);
     this.constructVote = this.constructVote.bind(this);
     this.signVote = this.signVote.bind(this);
-    this.processVote = this.processVote.bind(this);
+    this.processTransaction = this.processTransaction.bind(this);
 
     // Withdraw methods
     this.prepareWithdrawScript = this.prepareWithdrawScript.bind(this);
@@ -96,10 +92,11 @@ class VoteControls extends Component {
   }
 
   prepareScript() {
-    const { proposalId } = this.props;
+    const { proposals, proposalId } = this.props;
     const { yesBoxAddress, noBoxAddress } = proposals[proposalId];
+    console.log({yesBoxAddress, noBoxAddress});
     const hexId = toHex(proposalId, 12);
-
+    const { bytecode, template } = voteBoothInterface;
     // Bytecode templates
     const {
       VOICE_CREDITS,
@@ -162,7 +159,8 @@ class VoteControls extends Component {
 
     // TODO: We can put all UTXO here for consolidation
     return {
-      unspent: voiceCreditsUTXOs[0]
+      unspent: [voiceCreditsUTXOs[0]],
+      all: voiceCreditsUTXOs
     };
   }
 
@@ -179,6 +177,7 @@ class VoteControls extends Component {
   }
 
   async getVoteTokens(address) {
+    console.log("Get vote tokens from:", address);
     const { VOICE_TOKENS_COLOR } = voltConfig;
     const voiceTokensUTXOs = await getUTXOs(
       plasma,
@@ -186,19 +185,22 @@ class VoteControls extends Component {
       VOICE_TOKENS_COLOR
     );
 
+    console.log("get vote otkens");
+    console.log({ voiceTokensUTXOs });
+
     // TODO: Pick enough outputs
     const voiceTokensOutput = voiceTokensUTXOs[0];
 
     console.log({ voiceTokensUTXOs });
 
     return {
-      unspent: voiceTokensOutput,
+      unspent: [voiceTokensOutput],
       all: voiceTokensUTXOs
     };
   }
 
   async getOutputs() {
-    const { account, proposalId } = this.props;
+    const { account, proposals, proposalId } = this.props;
     const proposal = proposals[proposalId];
     const { boothAddress } = proposal;
     // TODO: Parallelize with Promise.all([...promises])
@@ -216,8 +218,8 @@ class VoteControls extends Component {
   }
 
   getDataFromTree() {
-    const t = utils.parseEther('1');
-    console.log('Test', padHex(t.toHexString(), 64));
+    const t = utils.parseEther("1");
+    console.log("Test", padHex(t.toHexString(), 64));
     const { account, proposalId } = this.props;
 
     let tree;
@@ -230,11 +232,12 @@ class VoteControls extends Component {
       castedVotes = 0;
     } else {
       const parsedTree = JSON.parse(localTree);
-      console.log({parsedTree});
+      console.log({ parsedTree });
       tree = new SMT(9, parsedTree);
       castedVotes = utils.formatEther(parsedTree[proposalId]);
     }
     const proof = tree.createMerkleProof(proposalId);
+    console.log("root:", tree.root);
 
     console.log({ castedVotes, proof });
 
@@ -250,8 +253,8 @@ class VoteControls extends Component {
     const parsedTree = JSON.parse(localTree);
     parsedTree[proposalId] = padHex(newLeaf.toHexString(), 64);
 
-    console.log({castedVotes, newLeaf});
-    console.log({parsedTree});
+    console.log({ castedVotes, newLeaf });
+    console.log({ parsedTree });
 
     storeValues({ votes: JSON.stringify(parsedTree) }, account);
 
@@ -268,7 +271,7 @@ class VoteControls extends Component {
   cookVoteParams(balanceCardId, prevVotes, newVotes) {
     const { proof } = this.state;
 
-    const { abi } = votingBoothArtifact;
+    const { abi } = voteBoothInterface;
     const contractInterface = new utils.Interface(abi);
 
     return contractInterface.functions.castBallot.encode([
@@ -282,7 +285,10 @@ class VoteControls extends Component {
   async constructVote(outputs, script, data) {
     const { gas, voteTokens, voteCredits, balanceCard } = outputs;
 
-    const { all } = voteTokens;
+    const mapInput = utxo => new Input({ prevout: utxo.outpoint });
+
+    const voteCreditsInputs = voteCredits.unspent.map(mapInput);
+    const voteTokensInputs = voteTokens.unspent.map(mapInput);
 
     const vote = Tx.spendCond(
       [
@@ -291,14 +297,10 @@ class VoteControls extends Component {
           script
         }),
         new Input({
-          prevout: voteTokens.unspent.outpoint
-        }),
-        new Input({
-          prevout: voteCredits.unspent.outpoint
-        }),
-        new Input({
           prevout: balanceCard.unspent.outpoint
-        })
+        }),
+        ...voteCreditsInputs,
+        ...voteTokensInputs
       ],
       // Outputs is empty, cause it's hard to guess what it should be
       []
@@ -308,13 +310,20 @@ class VoteControls extends Component {
     return vote;
   }
 
-  async signVote(vote) {
+  async signVote(vote, voiceInputs) {
     const { metaAccount, web3 } = this.props;
 
     if (metaAccount && metaAccount.privateKey) {
-      // TODO: Check that this is working on mobile, where you don't have Metamask
-      //vote.signAll(metaAccount.privateKey);
-      vote.sign([null, null, null, metaAccount.privateKey]);
+      const numOfInputs = vote.inputs.length;
+      const privateKeys = [];
+      for (let i = 0; i < numOfInputs; i++) {
+        if (i > 0 && i < voiceInputs) {
+          privateKeys.push(metaAccount.privateKey);
+        } else {
+          privateKeys.push(null);
+        }
+      }
+      vote.sign(privateKeys);
     } else {
       await window.ethereum.enable();
       await vote.signWeb3(web3);
@@ -325,10 +334,19 @@ class VoteControls extends Component {
     const { metaAccount, web3 } = this.props;
 
     if (metaAccount && metaAccount.privateKey) {
-      // TODO: Check that this is working on mobile, where you don't have Metamask
-      //vote.signAll(metaAccount.privateKey);
-      withdraw.sign([null, null, null, null, metaAccount.privateKey]);
+      const numOfInputs = withdraw.inputs.length;
+      const privateKeys = [];
+      for (let i = 0; i < numOfInputs; i++) {
+        if (i === 1) {
+          privateKeys.push(metaAccount.privateKey);
+        } else {
+          privateKeys.push(null);
+        }
+      }
+
+      withdraw.sign(privateKeys);
     } else {
+      // THIS ONE IS NOT WORKING NOW
       await window.ethereum.enable();
       await withdraw.signWeb3(web3);
     }
@@ -344,7 +362,7 @@ class VoteControls extends Component {
     }
   }
 
-  async processVote(vote) {
+  async processTransaction(vote) {
     const plasmaWeb3 = helpers.extendWeb3(new Web3(RPC));
     const receipt = await plasmaWeb3.eth.sendSignedTransaction(vote.hex());
     return receipt;
@@ -368,7 +386,7 @@ class VoteControls extends Component {
 
     const sign = choice === "yes" ? 1 : -1;
 
-    const prevNumOfVotes = utils.parseEther((castedVotes).toString());
+    const prevNumOfVotes = utils.parseEther(castedVotes.toString());
     const newVotesTotal = Math.abs(parseInt(castedVotes)) + parseInt(votes);
     const newNumOfVotes = utils.parseEther((sign * newVotesTotal).toString());
 
@@ -379,23 +397,28 @@ class VoteControls extends Component {
       prevNumOfVotes,
       newNumOfVotes
     );
+    console.log("OUTPUTS", outputs);
     const vote = await this.constructVote(outputs, script, data);
 
     console.log({ vote });
 
     // Sign and check vote
-    await this.signVote(vote);
+
+    const { voteCredits } = outputs;
+
+    const privateOutputs = voteCredits.unspent.length;
+    await this.signVote(vote, privateOutputs);
     const check = await this.checkCondition(vote);
 
     console.log({ check });
     vote.outputs = check.outputs.map(o => new Output(o));
-    await this.signVote(vote);
+    await this.signVote(vote, privateOutputs);
 
     const secondCheck = await this.checkCondition(vote);
     console.log({ secondCheck });
 
     // Submit vote to blockchain
-    const receipt = await this.processVote(vote);
+    const receipt = await this.processTransaction(vote);
     console.log({ receipt });
     this.writeDataToTree(newVotesTotal, newNumOfVotes);
 
@@ -406,10 +429,14 @@ class VoteControls extends Component {
   // WITHDRAW RELATED METHODS
 
   prepareWithdrawScript() {
-    const { proposalId, trashBox } = this.props;
+    const { proposals, proposalId, trashBox } = this.props;
+    const { castedVotes } = this.state;
     const { yesBoxAddress, noBoxAddress } = proposals[proposalId];
     console.log({ yesBoxAddress, noBoxAddress });
     const hexId = toHex(proposalId, 12);
+
+    const { bytecode, template } = ballotBoxInterface;
+
     const {
       VOICE_CREDITS,
       VOICE_TOKENS,
@@ -417,7 +444,7 @@ class VoteControls extends Component {
       TRASH_BOX,
       PROPOSAL_ID,
       IS_YES
-    } = ballotBoxInterface.template;
+    } = template;
 
     const {
       CONTRACT_VOICE_CREDITS,
@@ -428,6 +455,8 @@ class VoteControls extends Component {
     // TODO: Add selection here
     const YES = "0x000000000001";
     const NO = "0x000000000000";
+
+    const BOX = castedVotes > 0 ? YES : NO;
 
     // Construct new bytecode
     let finalBytecode = replaceAll(
@@ -446,7 +475,7 @@ class VoteControls extends Component {
       CONTRACT_VOICE_BALANCE_CARD
     );
     finalBytecode = replaceAll(finalBytecode, TRASH_BOX, trashBox);
-    finalBytecode = replaceAll(finalBytecode, IS_YES, YES);
+    finalBytecode = replaceAll(finalBytecode, IS_YES, BOX);
     finalBytecode = replaceAll(finalBytecode, PROPOSAL_ID, hexId);
     return Buffer.from(finalBytecode, "hex");
   }
@@ -477,11 +506,10 @@ class VoteControls extends Component {
 
   cookWithdrawParams(balanceCardId, amount) {
     const { proof } = this.state;
-
     const { abi } = ballotBoxInterface;
     const contractInterface = new utils.Interface(abi);
 
-    console.log({amount});
+    // const amount = utils.parseEther("3");
 
     return contractInterface.functions.withdraw.encode([
       parseInt(balanceCardId),
@@ -494,7 +522,12 @@ class VoteControls extends Component {
   async constructWithdraw(outputs, script, data) {
     const { gas, voteTokens, voteCredits, balanceCard } = outputs;
 
-    console.log({voteTokens});
+    const mapInput = utxo => new Input({ prevout: utxo.outpoint });
+
+    const voteTokensInputs = voteTokens.unspent.map(mapInput);
+    const voteCreditsInputs = voteCredits.unspent.map(mapInput);
+
+    console.log({ voteTokensInputs, voteCreditsInputs });
 
     const inputs = [
       new Input({
@@ -502,17 +535,10 @@ class VoteControls extends Component {
         script
       }),
       new Input({
-        prevout: voteTokens.all[0].outpoint
-      }),
-      new Input({
-        prevout: voteTokens.all[1].outpoint
-      }),
-      new Input({
-        prevout: voteCredits.unspent.outpoint
-      }),
-      new Input({
         prevout: balanceCard.unspent.outpoint
-      })
+      }),
+      ...voteTokensInputs,
+      ...voteCreditsInputs
     ];
 
     const withdraw = Tx.spendCond(
@@ -538,7 +564,7 @@ class VoteControls extends Component {
     const treeData = this.getDataFromTree();
     console.log({ treeData });
 
-    const currentVotes = utils.parseEther((castedVotes).toString());
+    const currentVotes = utils.parseEther(castedVotes.toString());
 
     const data = this.cookWithdrawParams(balanceCard.id, currentVotes);
 
@@ -547,6 +573,7 @@ class VoteControls extends Component {
     console.log({ withdraw });
 
     //await this.signVote(withdraw);
+
     await this.signWithdraw(withdraw);
     const check = await this.checkCondition(withdraw);
 
@@ -557,16 +584,16 @@ class VoteControls extends Component {
     const secondCheck = await this.checkCondition(withdraw);
     console.log({ secondCheck });
 
-    /*    // Update vote and sign again
-    this.updateVoteOutputs(withdraw, check.outputs);
-    await this.signVote(withdraw);
-    const secondCheck = await this.checkCondition(withdraw);
-    console.log({ secondCheck });*/
+    const zeroVotes = utils.parseEther("0");
+
+    // Process withdrawal
+    const receipt = await this.processTransaction(withdraw);
+    console.log({ receipt });
+
+    this.writeDataToTree(0, zeroVotes);
 
     this.setProgressState(false);
-
-    // TODO: Do we need to show receipt screen here?
-    // this.setReceiptState(true);
+    this.setReceiptState(true);
   }
 
   setProgressState(bool) {
