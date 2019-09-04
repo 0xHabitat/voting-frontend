@@ -381,7 +381,6 @@ class VoteControls extends Component {
       { value: "no", color: "voltBrandRed" }
     ];
     const disabled = votes < 1 || choice === "";
-    // console.log(this.state);
     return (
       <Container>
         {showProgress && <Progress />}
