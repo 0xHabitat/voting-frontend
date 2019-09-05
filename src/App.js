@@ -883,6 +883,7 @@ export default class App extends Component {
                     favorites={favorites}
                     voteStartTime={voteStartTime}
                     voteEndTime={voteEndTime}
+                    account={account}
                   />
                 )} />
 

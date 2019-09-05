@@ -18,6 +18,7 @@ export default function MainPage({
   favorites,
   voteStartTime,
   voteEndTime,
+  account
 }) {
   const filteredList = React.useMemo(() => {
     const sortFunctions = {
@@ -60,11 +61,7 @@ export default function MainPage({
       <Footer
         voteStartTime={voteStartTime}
         voteEndTime={voteEndTime}
-        history={[
-          { id: "EA001", votes: 2 },
-          { id: "EA003", votes: 4 },
-          { id: "EA002", votes: 1 }
-        ]}
+        account={account}
       />
     </>
   );

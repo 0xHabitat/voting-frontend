@@ -67,6 +67,8 @@ class VoteControls extends Component {
     this.submitVote = this.submitVote.bind(this);
     this.withdrawVote = this.withdrawVote.bind(this);
 
+    this.storeVotingAction = this.storeVotingAction.bind(this);
+
     const treeData = this.getDataFromTree();
     this.state = {
       expanded: false,
@@ -404,6 +406,13 @@ class VoteControls extends Component {
       console.log({receipt});
       this.writeDataToTree(newVotesTotal, newNumOfVotes);
 
+      // Store voting action in history
+      this.storeVotingAction({
+        type: "cast",
+        votes: sign * newVotesTotal,
+        balanceCard,
+      });
+
       this.setProgressState(false);
       this.setReceiptState(true);
     } catch (error) {
@@ -519,7 +528,8 @@ class VoteControls extends Component {
       const treeData = this.getDataFromTree();
       console.log({treeData});
 
-      const currentVotes = utils.parseEther(castedVotes.toString());
+      const votes = castedVotes.toString();
+      const currentVotes = utils.parseEther(votes);
 
       const data = this.cookWithdrawParams(balanceCard.id, currentVotes);
 
@@ -546,6 +556,13 @@ class VoteControls extends Component {
       console.log({receipt});
 
       this.writeDataToTree(0, zeroVotes);
+
+      // Store voting action in history
+      this.storeVotingAction({
+        type: "withdraw",
+        votes,
+        balanceCard,
+      });
 
       this.setProgressState(false);
       this.setReceiptState(true);
@@ -599,6 +616,29 @@ class VoteControls extends Component {
         expand: true
       };
     });
+  }
+
+  storeVotingAction(params){
+    const { account , proposal } = this.props;
+    const { proposalId } = proposal;
+    const { type, votes, balanceCard } = params;
+    const timestamp = new Date();
+
+    // TODO: We shall use balance card id, but needed quick solution
+    // const { id } = balanceCard;
+    const id = account;
+
+    const prevValues = getStoredValue("votesHistory", id);
+    const parsedHistory = prevValues ? JSON.parse(prevValues) : [];
+    parsedHistory.push({
+      type,
+      votes,
+      proposalId,
+      timestamp
+    });
+    const history = JSON.stringify(parsedHistory);
+
+    storeValues({history}, id);
   }
 
   render() {

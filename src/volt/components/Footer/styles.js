@@ -45,19 +45,23 @@ export const History = ({ history }) => {
   return (
     <HistoryContainer>
       <HistoryTitle>Voice History</HistoryTitle>
-      {history.map(item => {
+      {history.length > 0 ?
+      history.map(item => {
+        const {votes, proposalId, timestamp} = item;
         let suffix = "Voice Credit";
-        if (item.votes !== 1) {
+        if (Math.abs(votes) !== 1 ) {
           suffix += "s";
         }
         const t = `${item.votes} ${suffix}`;
 
         return (
-          <HistoryItem key={item.id}>
-            <span>{item.id}</span> {t}
+          <HistoryItem key={timestamp}>
+            <span>{proposalId}</span> {t}
           </HistoryItem>
         );
-      })}
+      })
+        : <Text color={"voltBrandWhite"} opacity={0.6}>No votes casted</Text>
+      }
     </HistoryContainer>
   );
 };
