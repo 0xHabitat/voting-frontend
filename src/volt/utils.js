@@ -9,8 +9,8 @@ import {
   privateToAddress
 } from "ethereumjs-util";
 
-export const contains = (proposal, field, query) => {
-  const fieldValue = proposal[field].toLowerCase();
+export const contains = (string, query) => {
+  const fieldValue = string.toLowerCase();
   return fieldValue.includes(query);
 };
 
