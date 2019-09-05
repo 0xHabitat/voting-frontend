@@ -8,8 +8,8 @@ const Footer = (props) => {
   // TODO: Need optimization with use of state or context
   const prevValues = getStoredValue("votesHistory", account);
   const parsedHistory = prevValues ? JSON.parse(prevValues) : [];
+  const history = parsedHistory.reverse().slice(0, 3);
 
-  const history = parsedHistory.reverse().slice(3);
   return (
     <FooterContainer>
       <History history={history} />
