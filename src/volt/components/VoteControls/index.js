@@ -560,7 +560,7 @@ class VoteControls extends Component {
       // Store voting action in history
       this.storeVotingAction({
         type: "withdraw",
-        votes,
+        votes: parseInt(votes),
         balanceCard,
       });
 
@@ -636,9 +636,9 @@ class VoteControls extends Component {
       proposalId,
       timestamp
     });
-    const history = JSON.stringify(parsedHistory);
+    const votesHistory = JSON.stringify(parsedHistory);
 
-    storeValues({history}, id);
+    storeValues({votesHistory}, id);
   }
 
   render() {
