@@ -20,9 +20,7 @@ import {
 
 import {
   getUTXOs,
-  toHex,
   padHex,
-  replaceAll,
   generateProposal,
   gte,
   randomItem,
@@ -34,6 +32,8 @@ import Receipt from "../Receipt";
 
 const RPC = "https://testnet-node1.leapdao.org";
 const plasma = new providers.JsonRpcProvider(RPC);
+
+const BN = Web3.utils.BN;
 
 class VoteControls extends Component {
   constructor(props) {
@@ -123,16 +123,29 @@ class VoteControls extends Component {
 
   async getVoteCredits(address) {
     const { VOICE_CREDITS_COLOR } = voltConfig;
-    const voiceCreditsUTXOs = await getUTXOs(
+    const sortedCreditsUTXOs = (await getUTXOs(
       plasma,
       address,
       VOICE_CREDITS_COLOR
+    )).sort((a, b) => 
+      new BN(a.output.value).lt(new BN(b.output.value)) ? 1 : -1
     );
+
+    console.log({ sortedCreditsUTXOs });
+
+    // take the largest UTXO and 3 of the smallest to consolidate
+    // so it is 4 → 1 consolidation
+    const utxosToSpendAndConsolidate = [
+      sortedCreditsUTXOs[0],
+      ...sortedCreditsUTXOs.slice(1).slice(-3)
+    ];
+
+    console.log({ utxosToSpendAndConsolidate });
 
     // TODO: We can put all UTXO here for consolidation
     return {
-      unspent: [voiceCreditsUTXOs[0]],
-      all: voiceCreditsUTXOs
+      unspent: utxosToSpendAndConsolidate,
+      all: sortedCreditsUTXOs,
     };
   }
 
