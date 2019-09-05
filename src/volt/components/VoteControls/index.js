@@ -231,11 +231,11 @@ class VoteControls extends Component {
       castedVotes = utils.formatEther(parsedTree[motionId]);
     }
     const proof = tree.createMerkleProof(motionId);
-    console.log("root:", tree.root);
 
     console.log({ castedVotes, proof });
 
     return {
+      root: tree.root,
       proof,
       castedVotes
     };
@@ -375,7 +375,11 @@ class VoteControls extends Component {
     const { balanceCard } = outputs;
 
     const treeData = this.getDataFromTree();
-    console.log({ treeData });
+
+    if (balanceCard.unspent.output.data !== treeData.root){
+      throw Error(`local Storage and balance card out of sync: ${balanceCard.unspent.output.data} / ${treeData.root}`);
+    }
+
 
     const sign = choice === "yes" ? 1 : -1;
 
@@ -396,6 +400,7 @@ class VoteControls extends Component {
     const privateOutputs = outputs.voteCredits.unspent.length;
     await this.signVote(vote, privateOutputs);
     const check = await this.checkCondition(vote);
+    console.log('check', check);
 
     // Update vote and sign again
     vote.outputs = check.outputs.map(Output.fromJSON);
