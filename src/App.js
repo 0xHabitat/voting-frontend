@@ -32,6 +32,7 @@ import { fetchBalanceCard } from "./volt/utils";
 
 import MainPage from "./MainPage";
 import ProposalPage from "./ProposalPage";
+import ResultPage from "./ResultPage";
 import Advanced from "./components/Advanced";
 import AlertBox from './volt/components/AlertBox';
 
@@ -883,6 +884,12 @@ export default class App extends Component {
                     favorites={favorites}
                     voteStartTime={voteStartTime}
                     voteEndTime={voteEndTime}
+                  />
+                )} />
+
+                <Route path="/results" exact render={() => (
+                  <ResultPage
+                    proposals={proposalsList}
                   />
                 )} />
 
