@@ -29,8 +29,7 @@ export const HistoryItem = styled(Text).attrs(() => ({
 }))`
   & span {
     font-weight: bold;
-    &:before {
-      content: ">";
+    i {
       margin-right: 4px;
     }
     &:after {
@@ -46,20 +45,20 @@ export const History = ({ history }) => {
     <HistoryContainer>
       <HistoryTitle>Voice History</HistoryTitle>
       {history.length > 0 ?
-      history.map(item => {
-        const {votes, proposalId, timestamp} = item;
-        let suffix = "Voice Credit";
-        if (Math.abs(votes) !== 1 ) {
-          suffix += "s";
-        }
-        const t = `${item.votes} ${suffix}`;
-
-        return (
-          <HistoryItem key={timestamp}>
-            <span>{proposalId}</span> {t}
-          </HistoryItem>
-        );
-      })
+        history.map(item => {
+          const {type, votes, proposalId, timestamp} = item;
+          let suffix = "Voice Credit";
+          if (Math.abs(votes) !== 1 ) {
+            suffix += "s";
+          }
+          const t = `${item.votes} ${suffix}`;
+          const prefix = type === "cast" ? ">" : "<";
+          return (
+            <HistoryItem key={timestamp}>
+              <span><i>{prefix}</i>{proposalId}</span> {t}
+            </HistoryItem>
+          );
+        })
         : <Text color={"voltBrandWhite"} opacity={0.6}>No votes casted</Text>
       }
     </HistoryContainer>
