@@ -777,12 +777,16 @@ export default class App extends Component {
     const response = await fetch(endpoint);
     const body = await response.json();
     const {
-      proposals,
+      proposals: proposalsList,
       voteEndTime,
       voteStartTime,
       trashAddress
     } = body.contents;
-    const proposals = proposalsList.filter(p => p.proposalId)
+
+    const proposals = proposalsList
+      .map((p,i)=>({...p, id: i }))
+      .filter(p => p.proposalId);
+
     this.setState(state => ({
       ...state,
       proposalsList: proposals,
@@ -854,13 +858,10 @@ export default class App extends Component {
       filteredList,
       proposalsList,
       filterQuery,
-      favorites,
-      proposalsList,
-      proposalsDictionary
+      favorites
     } = this.state;
-    const { voteStartTime, voteEndTime, trashBox } = this.state;
 
-    const { voteStartTime, voteEndTime } = this.state;
+    const { voteStartTime, voteEndTime, trashBox } = this.state;
     const web3Props = { plasma: xdaiweb3, web3, account, metaAccount };
     return (
       <>
@@ -897,6 +898,7 @@ export default class App extends Component {
                         favorite={favorites[proposalId]}
                         toggleFavorites={this.toggleFavorites}
                         proposal={proposal}
+                        trashBox={trashBox}
                         creditsBalance={creditsBalance}
                         goBack={() => history.replace('/')}
                       />
