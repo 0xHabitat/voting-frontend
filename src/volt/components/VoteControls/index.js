@@ -219,7 +219,6 @@ class VoteControls extends Component {
     let tree;
     let castedVotes;
     let localTree = getStoredValue("votes", account);
-
     if (!localTree) {
       console.log("local tree is empty");
       tree = new SMT(9);
@@ -316,7 +315,7 @@ class VoteControls extends Component {
     if (metaAccount && metaAccount.privateKey) {
       const privateKeys = [];
       for (let i = 0; i < numOfInputs; i++) {
-        if (i > 0 && i < voiceInputs) {
+        if (i > 0 && i <= voiceInputs + 1) {
           privateKeys.push(metaAccount.privateKey);
         } else {
           privateKeys.push(null);
@@ -325,9 +324,9 @@ class VoteControls extends Component {
       vote.sign(privateKeys);
     } else {
       await window.ethereum.enable();
-      const { r, s, v, signer } = await Tx.signMessageWithWeb3(web3, vote.sigData(), 0);
+      const { r, s, v, signer } = await Tx.signMessageWithWeb3(web3, vote.sigData(), 0);  
       for (let i = 0; i < numOfInputs; i++) {
-        if (i === 1) {
+        if (i > 0 && i <= voiceInputs + 1) {
           vote.inputs[i].setSig(r, s, v, signer);
         }
       }
