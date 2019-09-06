@@ -799,13 +799,14 @@ class App extends Component {
   async loadProposals() {
     const endpoint = "https://api.npoint.io/217ecb17f01746799a3b";
     const response = await fetch(endpoint);
+
     const body = await response.json();
     const {
       proposals: proposalsList,
       voteEndTime,
       voteStartTime,
       trashAddress
-    } = body.contents;
+    } = body;
 
     // ToDo: remove second filter when store won't have any duplicate proposalId
     const proposals = proposalsList
