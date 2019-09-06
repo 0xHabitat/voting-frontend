@@ -29,6 +29,8 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    this.setState({ broken: true });
+
     mapStackTrace(error.stack, stack => {
       const message = [
         error.toString(),
@@ -42,9 +44,9 @@ export default class ErrorBoundary extends React.Component {
   }
 
   render() {
-    const { message, copied } = this.state;
+    const { broken, message, copied } = this.state;
 
-    if (message) {
+    if (broken) {
       return (
         <Container>
           <h2>Something went wrong 😢</h2>
@@ -53,19 +55,25 @@ export default class ErrorBoundary extends React.Component {
             the page, thanks!
           </p>
 
-          <Details>
-            <details>
-              <Pre>{message}</Pre>
-            </details>
-          </Details>
+          {message ? (
+            <>
+              <Details>
+                <details>
+                  <Pre>{message}</Pre>
+                </details>
+              </Details>
 
-          <CopyToClipboard
-            text={message}
-            onCopy={() => this.setState({ copied: true })}
-          >
-            <Button>Copy to clipboard</Button>
-          </CopyToClipboard>
-          {copied && <p>Copied!</p>}
+              <CopyToClipboard
+                text={message}
+                onCopy={() => this.setState({ copied: true })}
+              >
+                <Button>Copy to clipboard</Button>
+              </CopyToClipboard>
+              {copied && <p>Copied!</p>}
+            </>
+          ) : (
+            <p>Loading details, wait... ⌛</p>
+          )}
         </Container>
       );
     }
