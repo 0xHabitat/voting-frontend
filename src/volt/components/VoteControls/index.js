@@ -98,8 +98,9 @@ class VoteControls extends Component {
     };
   }
 
-  setTokenNumber(event) {
+  setTokenNumber(event, lowerBound = 0) {
     const { target } = event;
+    if (target && target.value < lowerBound) return;
     this.setState(state => ({
       ...state,
       votes: target.value
@@ -701,7 +702,7 @@ class VoteControls extends Component {
           max={Math.max(max, 1)}
           steps={max + 1}
           value={votes}
-          onChange={this.setTokenNumber}
+          onChange={(e) => this.setTokenNumber(e, alreadyVoted ? 1 : 0)}
         />
         <SliderLabels>
           <Label>0</Label>
