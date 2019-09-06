@@ -404,7 +404,7 @@ class VoteControls extends Component {
     const newVotesTotal = Math.abs(parseInt(votes));
     const newNumOfVotes = utils.parseEther((sign * newVotesTotal).toString());
     
-    return { prevNumOfVotes, newVotesTotal, newNumOfVotes };
+    return { prevNumOfVotes, newVotesTotal, newNumOfVotes, sign };
   }
 
   async submitOrUpdateVote() {
@@ -569,7 +569,7 @@ class VoteControls extends Component {
     return withdraw;
   }
 
-  async withdrawVote(amountToWithdraw) {
+  async withdrawVote(e, amountToWithdraw) {
     const { changeAlert } = this.props;
 
     try {
@@ -583,7 +583,7 @@ class VoteControls extends Component {
       const treeData = this.getDataFromTree();
       console.log({treeData});
 
-      const { prevNumOfVotes, newVotesTotal, newNumOfVotes } = this.getCurrentVote();
+      const { prevNumOfVotes, sign } = this.getCurrentVote();
 
       amountToWithdraw = amountToWithdraw || prevNumOfVotes;
       const data = this.cookWithdrawParams(balanceCard.id, prevNumOfVotes, amountToWithdraw);
@@ -608,11 +608,14 @@ class VoteControls extends Component {
       const secondCheck = await this.checkCondition(withdraw);
       console.log({secondCheck});
 
+      const newCastedVoteVal = prevNumOfVotes.sub(amountToWithdraw);
+      const newLeafValue = utils.parseEther((newCastedVoteVal.mul(sign)).toString());
+
       // Process withdrawal
       const receipt = await this.processTransaction(withdraw);
       console.log({receipt});
 
-      this.writeDataToTree(newVotesTotal, newNumOfVotes);
+      this.writeDataToTree(newCastedVoteVal, newLeafValue);
 
       this.setProgressState(false);
       this.setReceiptState(true);
