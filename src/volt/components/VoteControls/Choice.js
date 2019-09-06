@@ -31,21 +31,22 @@ const Option = styled(Flex).attrs({
 `;
 
 export const Choice = props => {
-  const { options, selection, disabled } = props;
+  const { options, selection, alreadyVoted } = props;
   const { onChange } = props;
   return (
     <OptionContainer num={options.length}>
       {options.map(option => {
         const { value, color } = option;
         const selected = value === selection;
+        const disabled = alreadyVoted && !selected;
         return (
           <Option
             key={option.value}
             selected={selected}
             onClick={() => !disabled && onChange(option)}
             optionColor={color}
-            disabled={!selected}
-            title={!selected ? 'Withdraw your previous vote first' : ''}
+            disabled={disabled}
+            title={disabled ? 'Withdraw your previous vote first' : ''}
           >
             {value}
           </Option>

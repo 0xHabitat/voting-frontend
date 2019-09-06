@@ -964,6 +964,7 @@ class App extends Component {
                         creditsBalance={creditsBalance}
                         goBack={() => history.replace('/')}
                         changeAlert={this.changeAlert}
+                        history={history}
                       />
                     )
                   }
