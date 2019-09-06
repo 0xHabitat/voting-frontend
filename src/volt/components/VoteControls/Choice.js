@@ -8,6 +8,7 @@ const OptionContainer = styled.div`
   grid-template-columns: ${({ num = 1 }) => `repeat(${num}, auto)`};
   grid-column-gap: 16px;
   margin-bottom: 16px;
+  opacity: ${props => props.disabled ? 0.3 : 1};
 `;
 
 const Option = styled(Flex).attrs({
@@ -29,10 +30,10 @@ const Option = styled(Flex).attrs({
 `;
 
 export const Choice = props => {
-  const { options, selection } = props;
+  const { options, selection, disabled } = props;
   const { onChange } = props;
   return (
-    <OptionContainer num={options.length}>
+    <OptionContainer disabled={disabled} num={options.length}>
       {options.map(option => {
         const { value, color } = option;
         const selected = value === selection;
@@ -40,7 +41,7 @@ export const Choice = props => {
           <Option
             key={option.value}
             selected={selected}
-            onClick={() => onChange(option)}
+            onClick={() => !disabled && onChange(option)}
             optionColor={color}
           >
             {value}

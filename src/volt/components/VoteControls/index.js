@@ -40,6 +40,18 @@ const BN = Web3.utils.BN;
 const sortUtxosAsc = (a, b) => 
   new BN(a.output.value).lt(new BN(b.output.value)) ? 1 : -1;
 
+const choiceFromSign = (votes) => {
+  if (votes > 0) {
+    return 'yes';
+  }
+
+  if (votes < 0) {
+    return 'no';
+  }
+
+  return '';
+};
+
 class VoteControls extends Component {
   constructor(props) {
     super(props);
@@ -73,10 +85,12 @@ class VoteControls extends Component {
     this.withdrawVote = this.withdrawVote.bind(this);
 
     const treeData = this.getDataFromTree();
+    const votes = treeData.castedVotes || 0;
+
     this.state = {
       expanded: false,
-      votes: 0,
-      choice: "",
+      votes,
+      choice: choiceFromSign(votes),
       showProgress: false,
       showReceipt: false,
       ...treeData
@@ -633,15 +647,21 @@ class VoteControls extends Component {
   }
 
   render() {
-    const { expanded, votes, choice } = this.state;
+    const { votes, choice, castedVotes } = this.state;
     const { showReceipt, showProgress } = this.state;
     const { credits } = this.props;
-    const max = Math.floor(Math.sqrt(credits)) || 0;
+
     const options = [
       { value: "yes", color: "voltBrandGreen" },
       { value: "no", color: "voltBrandRed" }
     ];
-    const disabled = votes < 1 || choice === "";
+    const castedVotesNum = parseInt(castedVotes, 10);
+    const castedCredits = castedVotesNum * castedVotesNum;
+    const creditsNum = parseInt(credits, 10);
+    const max = Math.floor(Math.sqrt(castedCredits + creditsNum)) || 0;
+
+    const voteDisabled = votes < 1 || choice === "";
+    const disabled = castedCredits > 0;
 
     return (
       <Container>
@@ -649,15 +669,16 @@ class VoteControls extends Component {
         {showReceipt && (
           <Receipt voteType={choice} votes={votes} onClose={this.resetState} />
         )}
-        <Equation votes={votes} />
+        <Equation disabled={disabled} votes={castedVotesNum} />
         <StyledSlider
           min={0}
           max={Math.max(max, 1)}
           steps={max + 1}
           value={votes}
+          disabled={disabled}
           onChange={this.setTokenNumber}
         />
-        <SliderLabels>
+        <SliderLabels disabled={disabled}>
           <Label>0</Label>
           <Label>{max}</Label>
         </SliderLabels>
@@ -665,8 +686,9 @@ class VoteControls extends Component {
           options={options}
           selection={choice}
           onChange={this.setChoice}
+          disabled={disabled}
         />
-        <ActionButton disabled={disabled} onClick={this.submitVote}>
+        <ActionButton disabled={disabled || voteDisabled} onClick={this.submitVote}>
           Send Vote
         </ActionButton>
         <ActionButton onClick={this.withdrawVote}>Withdraw</ActionButton>
