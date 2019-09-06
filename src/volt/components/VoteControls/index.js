@@ -661,7 +661,7 @@ class VoteControls extends Component {
     const max = Math.floor(Math.sqrt(castedCredits + creditsNum)) || 0;
 
     const voteDisabled = votes < 1 || choice === "";
-    const disabled = castedCredits > 0;
+    const votedAlready = castedCredits > 0;
 
     return (
       <Container>
@@ -669,16 +669,15 @@ class VoteControls extends Component {
         {showReceipt && (
           <Receipt voteType={choice} votes={votes} onClose={this.resetState} />
         )}
-        <Equation disabled={disabled} votes={votes} />
+        <Equation votes={votes} />
         <StyledSlider
           min={0}
           max={Math.max(max, 1)}
           steps={max + 1}
           value={votes}
-          disabled={disabled}
           onChange={this.setTokenNumber}
         />
-        <SliderLabels disabled={disabled}>
+        <SliderLabels>
           <Label>0</Label>
           <Label>{max}</Label>
         </SliderLabels>
@@ -686,10 +685,10 @@ class VoteControls extends Component {
           options={options}
           selection={choice}
           onChange={this.setChoice}
-          disabled={disabled}
+          disabled={votedAlready}
         />
-        <ActionButton disabled={disabled || voteDisabled} onClick={this.submitVote}>
-          Send Vote
+        <ActionButton disabled={voteDisabled} onClick={this.submitVote}>
+          { votedAlready ? 'Update Vote' : 'Send Vote' }
         </ActionButton>
         <ActionButton onClick={this.withdrawVote}>Withdraw</ActionButton>
       </Container>

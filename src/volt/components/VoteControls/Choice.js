@@ -27,13 +27,14 @@ const Option = styled(Flex).attrs({
     selected ? theme.colors[optionColor] : theme.colors.voltBrandWhite};
   background-color: ${({ selected = false, optionColor, theme }) =>
     selected ? theme.colors[optionColor] : theme.colors.voltBrandMain};
+  opacity: ${props => props.disabled ? 0.3 : 1};
 `;
 
 export const Choice = props => {
   const { options, selection, disabled } = props;
   const { onChange } = props;
   return (
-    <OptionContainer disabled={disabled} num={options.length}>
+    <OptionContainer num={options.length}>
       {options.map(option => {
         const { value, color } = option;
         const selected = value === selection;
@@ -43,6 +44,7 @@ export const Choice = props => {
             selected={selected}
             onClick={() => !disabled && onChange(option)}
             optionColor={color}
+            disabled={!selected}
           >
             {value}
           </Option>
