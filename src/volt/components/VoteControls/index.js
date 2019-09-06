@@ -85,7 +85,7 @@ class VoteControls extends Component {
     this.withdrawVote = this.withdrawVote.bind(this);
 
     const treeData = this.getDataFromTree();
-    const votes = treeData.castedVotes || 0;
+    const votes = parseInt(treeData.castedVotes || 0);
 
     this.state = {
       expanded: false,
@@ -669,7 +669,7 @@ class VoteControls extends Component {
         {showReceipt && (
           <Receipt voteType={choice} votes={votes} onClose={this.resetState} />
         )}
-        <Equation disabled={disabled} votes={castedVotesNum} />
+        <Equation disabled={disabled} votes={votes} />
         <StyledSlider
           min={0}
           max={Math.max(max, 1)}
