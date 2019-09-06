@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Flex } from "rimble-ui";
-import * as ethers from "ethers";
 import { bi, divide } from "jsbi-utils";
 import { ProposalContainer,
   VoteInfo,
@@ -48,9 +47,6 @@ const Vote = styled.div`
   }
 `;
 
-const RPC = "https://testnet-node1.leapdao.org";
-const plasma = new ethers.providers.JsonRpcProvider(RPC);
-
 const ERC20 = [
   {
       "constant": true,
@@ -73,30 +69,30 @@ const ERC20 = [
   }
 ];
 
-
-
-const token = new ethers.Contract('0x3442c197cc858bED2476BDd9c7d4499552780f3D', ERC20, plasma);
-
-export default function ResultPage({ proposals = [] }) {
+export default function ResultPage({ proposals = [], web3Props }) {
   const [balances, setBalances] = React.useState(null);
   React.useEffect(() => {
     if (proposals.length) {
       const promises = [];
       const balances = {};
-
+      const contract = new web3Props.plasma.eth.Contract(ERC20, '0x3442c197cc858bED2476BDd9c7d4499552780f3D');
+      const batch = new web3Props.plasma.BatchRequest();
       proposals.forEach(({ proposalId, yesBoxAddress, noBoxAddress }) => {
-        promises.push(
-          Promise.all([
-            token.balanceOf(yesBoxAddress),
-            token.balanceOf(noBoxAddress),
-          ]).then(([yes, no]) => {
-            balances[proposalId] = {
-              yes: Number(divide(bi(yes.toString()), bi(10 ** 18)).toString()),
-              no: Number(divide(bi(no.toString()), bi(10 ** 18)).toString())
-            };
-          })
-        );
+        promises.push(new Promise((resolve) => {
+          const balance = {};
+          const setBalance = (key) => (_, result) => {
+            balance[key] = Number(divide(bi(result), bi(10 ** 18)).toString());
+            if (balance.yes !== undefined && balance.no !== undefined) {
+              balances[proposalId] = balance;
+              resolve();
+            }
+          };
+          batch.add(contract.methods.balanceOf(yesBoxAddress).call.request(setBalance('yes')));
+          batch.add(contract.methods.balanceOf(noBoxAddress).call.request(setBalance('no')));
+        }));
       });
+
+      batch.execute();
 
       Promise.all(promises).then(() => {
         setBalances(balances);
