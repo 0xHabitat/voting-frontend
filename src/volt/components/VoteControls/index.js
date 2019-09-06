@@ -426,10 +426,8 @@ class VoteControls extends Component {
 
   async submitVote() {
     const { changeAlert } = this.props;
-    const {votes, choice, castedVotes} = this.state;
     try {
       console.log("Display Progress Screen");
-      console.log({choice});
       this.setProgressState(true);
 
       /// START NEW CODE
