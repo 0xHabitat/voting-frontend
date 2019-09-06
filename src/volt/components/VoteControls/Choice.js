@@ -45,6 +45,7 @@ export const Choice = props => {
             onClick={() => !disabled && onChange(option)}
             optionColor={color}
             disabled={!selected}
+            title={!selected ? 'Withdraw your previous vote first' : ''}
           >
             {value}
           </Option>
