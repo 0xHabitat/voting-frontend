@@ -303,8 +303,7 @@ class VoteControls extends Component {
 
   async constructVote(outputs, script, data) {
     const { gas, voteTokens, voteCredits, balanceCard } = outputs;
-    console.log(voteCredits);
-    console.log(voteTokens);
+
     const vote = Tx.spendCond(
       [
         new Input({
@@ -543,8 +542,6 @@ class VoteControls extends Component {
       console.log({treeData});
 
       const currentVotes = utils.parseEther(castedVotes.toString());
-
-      console.log({ currentVotes });
 
       const data = this.cookWithdrawParams(balanceCard.id, currentVotes);
 
