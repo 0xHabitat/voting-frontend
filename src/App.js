@@ -867,6 +867,7 @@ class App extends Component {
 
     const { voteStartTime, voteEndTime, trashBox } = this.state;
     const web3Props = { plasma: xdaiweb3, web3, account, metaAccount };
+
     return (
       <>
           {account ? (
