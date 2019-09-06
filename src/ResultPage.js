@@ -9,6 +9,7 @@ import { ProposalContainer,
   ProposalId,
   Topic,
   Title } from './volt/components/ProposalsList/SingleProposal/styles';
+import { voltConfig } from "./volt/config";
 
 const Container = styled(Flex).attrs({
   flexDirection: 'column',
@@ -75,7 +76,7 @@ export default function ResultPage({ proposals = [], web3Props }) {
     if (proposals.length) {
       const promises = [];
       const balances = {};
-      const contract = new web3Props.plasma.eth.Contract(ERC20, '0x3442c197cc858bED2476BDd9c7d4499552780f3D');
+      const contract = new web3Props.plasma.eth.Contract(ERC20, voltConfig.CONTRACT_VOICE_TOKENS);
       const batch = new web3Props.plasma.BatchRequest();
       proposals.forEach(({ proposalId, yesBoxAddress, noBoxAddress }) => {
         promises.push(new Promise((resolve) => {
