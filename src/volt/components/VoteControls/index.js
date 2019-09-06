@@ -420,7 +420,7 @@ class VoteControls extends Component {
     if (isAddingMoreVotes) {
       return this.submitVote();
     } else {
-      return this.withdrawVote(prevNumOfVotes.sub(newNumOfVotes));
+      return this.withdrawVote(null, prevNumOfVotes.sub(newNumOfVotes));
     }
   }
 
