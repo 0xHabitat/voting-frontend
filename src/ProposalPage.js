@@ -140,7 +140,7 @@ export default function ProposalPage({
           {!showVoteControls &&
             <VoteFooter>
               <VoteButton
-                disabled={dayjs().isBefore(voteStartTime) || dayjs().isAfter(voteEndTime)}
+                //disabled={dayjs().isBefore(voteStartTime) || dayjs().isAfter(voteEndTime)}
                 onClick={() => setShowVoteControls(true) }>
               {dayjs().isBefore(voteStartTime) ? `VOTE STARTET ${dayjs().to(dayjs(voteStartTime))}`.toUpperCase() : dayjs().isAfter(voteEndTime) ? "VOTE GESCHLOSSEN" : "JETZT VOTEN"}
               </VoteButton>
