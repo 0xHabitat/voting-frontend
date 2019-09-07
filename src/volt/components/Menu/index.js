@@ -13,7 +13,6 @@ const Menu = ({ onClose, account }) => (
         <Item target="_blank" href="https://www.deora.earth/volt-platform/blockchain">Die Blockchain</Item>
         <Item target="_blank" href="https://www.deora.earth/volt-platform/privacy">Sicherheit & Privacy</Item>
         <Item target="_blank" href="https://www.deora.earth/volt-platform/extra-proposals">Weitere Anträge</Item>
-        <Item target="_blank" href="https://volt.deora.earth/results">Wahlergebnisse</Item>
       </MenuItems>
       <AccountDetails>
         <Label>Your Account Address:</Label>
