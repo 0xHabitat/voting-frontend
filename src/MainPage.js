@@ -16,8 +16,6 @@ export default function MainPage({
   toggleFavorites,
   filterQuery,
   favorites,
-  voteStartTime,
-  voteEndTime,
   userVotes
 }) {
   const filteredList = React.useMemo(() => {

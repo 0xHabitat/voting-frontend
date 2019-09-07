@@ -820,7 +820,7 @@ class App extends Component {
       voteStartTime,
       trashAddress
     } = body;
-    
+
     // ToDo: remove second filter when store won't have any duplicate proposalId
     const proposals = proposalsList
       .map((p,i)=>({...p, id: i }))
@@ -999,7 +999,7 @@ class App extends Component {
                 <Redirect to="/"/>
               )} />
 
-              { alert && <AlertBox alert={alert} changeAlert={this.changeAlert}/> }
+              {alert && <AlertBox alert={alert} changeAlert={this.changeAlert}/>}
             </MainContainer>
           ) : (
             <Loader />

@@ -90,7 +90,7 @@ export default function ProposalPage({
   voteEndTime,
   history
 }) {
-  const [showVoteControls, setShowVoteControls] = useState(null);
+  const [showVoteControls, setShowVoteControls] = useState(false);
   const ref = useRef(null);
 
   const handleClickOutside = React.useCallback((event) => {
