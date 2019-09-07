@@ -109,9 +109,12 @@ class VoteControls extends Component {
   }
 
   setChoice({ value }) {
+    const { choice, votes } = this.state;
+    // if no decision yet, but slider is selected → preserve user's credits value
     this.setState(state => ({
       ...state,
-      choice: value
+      choice: value,
+      votes: choice === '' && votes > 0 ? votes : 1,
     }));
   }
 
@@ -241,7 +244,7 @@ class VoteControls extends Component {
     // TODO: Parallelize with Promise.all([...promises])
     const gas = await this.getGas(boothAddress);
     const voteTokens = await this.getVoteTokens(
-      boothAddress, new BN(utils.parseEther(votes).toString())
+      boothAddress, new BN(utils.parseEther(votes.toString()).toString())
     );
     const balanceCard = await this.getBalanceCard(account);
     const voteCredits = await this.getMyVoteCredits();
@@ -709,9 +712,7 @@ class VoteControls extends Component {
       { value: "yes", label: "Ja", color: "voltBrandGreen" },
       { value: "no", label: "Nein", color: "voltBrandRed" }
     ];
-    console.log({ castedVotes });
     const castedCredits = castedVotes.mul(castedVotes).div(factor18);
-    console.log({ credits, castedCredits });
 
     const totalCredits = castedCredits.add(credits || new BN(0)).div(factor18);
     // no sqrt in BN.js 🤷‍
@@ -757,6 +758,14 @@ class VoteControls extends Component {
             options={options}
             selection={choice}
             onChange={this.setChoice}
+            onClick={() => {
+              if (this.state.votes < max) {
+                this.setState(state => ({
+                  ...state,
+                  votes: state.votes + 1,
+                }));  
+              };
+            }}
             alreadyVoted={voteFormDisabled}
           />
           <ActionButton 
