@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRef, useEffect, useState } from "react";
 import styled from 'styled-components';
 import { Flex, Box } from "rimble-ui";
 import dayjs from 'dayjs';
@@ -67,47 +68,58 @@ const Content = styled(Box).attrs({
   } */
 `;
 
-export default class ProposalPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showVoteControls: false,
-    };
+export default function ProposalPage({
+  proposal,
+  toggleFavorites,
+  favorite,
+  creditsBalance,
+  goBack,
+  web3Props,
+  changeAlert,
+  updateVotes,
+  voteStartTime,
+  voteEndTime,
+  history
+}) {
+  const [showVoteControls, setShowVoteControls] = useState(null);
+  const ref = useRef(null);
+
+  const onVoteControlOuterClick = () => {
+    setShowVoteControls(false);
+  };
+
+  const handleClickOutside = (event) => {
+    if (ref.current && ref.current.contains && !ref.current.contains(event.target)) {
+      onVoteControlOuterClick();
+    }
   }
-  render() {
-    const { showVoteControls } = this.state;
-    const {
-      proposal,
-      toggleFavorites,
-      favorite,
-      creditsBalance,
-      goBack,
-      web3Props,
-      changeAlert,
-      updateVotes,
-      voteStartTime,
-      voteEndTime,
-      history
-    } = this.props;
 
-    return (
-      <Container>
-        <Content as="article">
-          <HeaderBar as="nav">
-            <Back onClick={goBack}/>
-            <Star active={favorite} onClick={()=> toggleFavorites(proposal.proposalId)}/>
-          </HeaderBar>
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  });
 
-          <header>
-            <TopPart>
-              <ProposalId>{proposal.proposalId}</ProposalId>
-              {proposal.topic.map((t, i) => <Topic key={i}>{t}</Topic>)}
-            </TopPart>
-            <h1>{proposal.title}</h1>
-          </header>
-          <BB as="main">{proposal.description}</BB>
-        </Content>
+  return (
+    <Container>
+      <Content as="article">
+        <HeaderBar as="nav">
+          <Back onClick={goBack}/>
+          <Star active={favorite} onClick={()=> toggleFavorites(proposal.proposalId)}/>
+        </HeaderBar>
 
+        <header>
+          <TopPart>
+            <ProposalId>{proposal.proposalId}</ProposalId>
+            {proposal.topic.map((t, i) => <Topic key={i}>{t}</Topic>)}
+          </TopPart>
+          <h1>{proposal.title}</h1>
+        </header>
+        <BB as="main">{proposal.description}</BB>
+      </Content>
+
+      <div ref={ref}>
         <Footer as="footer">
           {showVoteControls &&
             <VoteControls
@@ -120,18 +132,17 @@ export default class ProposalPage extends React.Component {
               {...web3Props}
             />
           }
-
           {!showVoteControls &&
             <VoteFooter>
               <VoteButton
                 disabled={dayjs().isBefore(voteStartTime) || dayjs().isAfter(voteEndTime)}
-                onClick={() => this.setState({ showVoteControls: true })}>
+                onClick={() => setShowVoteControls(true) }>
               {dayjs().isBefore(voteStartTime) ? `VOTE STARTET ${dayjs().to(dayjs(voteStartTime))}`.toUpperCase() : dayjs().isAfter(voteEndTime) ? "VOTE GESCHLOSSEN" : "JETZT VOTEN"}
               </VoteButton>
             </VoteFooter>
           }
         </Footer>
-      </Container>
-    );
-  }
+      </div>
+    </Container>
+  );
 }
