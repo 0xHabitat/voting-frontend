@@ -698,8 +698,7 @@ class VoteControls extends Component {
 
     const votes = new BN(voteStr);
     const options = [
-      { value: "yes", label: "Vote setzen", color: "voltBrandGreen" }//,
-      // { value: "no", label: "Nein", color: "voltBrandRed" }
+      { value: "yes", label: "Vote setzen", color: "voltBrandGreen" }
     ];
     const castedCredits = castedVotes.mul(castedVotes).div(factor18);
 
