@@ -887,7 +887,7 @@ class App extends Component {
       <>
           {account ? (
             <MainContainer>
-              {isMenuOpen && <Menu onClose={this.closeMenu} account={account} />}
+              {isMenuOpen && <Menu onClose={this.closeMenu} account={account} voteEndTime={voteEndTime} />}
               <Header
                 credits={creditsBalance}
                 maxCredits={maxCredits}
