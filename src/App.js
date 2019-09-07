@@ -3,7 +3,7 @@ import { Tx, Input, Output, Util } from "leap-core";
 import { Dapparatus } from "dapparatus";
 import { equal, bi } from "jsbi-utils";
 import Web3 from "web3";
-import { Redirect, Route, withRouter } from 'react-router-dom';
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import i18n from "./i18n";
 import "./App.scss";
 
@@ -893,111 +893,113 @@ class App extends Component {
                 maxCredits={maxCredits}
                 openMenu={this.openMenu}
               />
+                <Switch>
+                  <Route path="/" exact render={() => (
+                    <MainPage
+                      proposalsList={proposalsList}
+                      filterList={this.filterList}
+                      resetFilter={this.resetFilter}
+                      sort={this.sort}
+                      sorting={this.state.sorting}
+                      sortingOrder={this.state.sortingOrder}
+                      toggleFavorites={this.toggleFavorites}
+                      filterQuery={filterQuery}
+                      favorites={favorites}
+                      voteStartTime={voteStartTime}
+                      voteEndTime={voteEndTime}
+                      userVotes={userVotes}
+                    />
+                  )} />
 
-                <Route path="/" exact render={() => (
-                  <MainPage
-                    proposalsList={proposalsList}
-                    filterList={this.filterList}
-                    resetFilter={this.resetFilter}
-                    sort={this.sort}
-                    sorting={this.state.sorting}
-                    sortingOrder={this.state.sortingOrder}
-                    toggleFavorites={this.toggleFavorites}
-                    filterQuery={filterQuery}
-                    favorites={favorites}
-                    voteStartTime={voteStartTime}
-                    voteEndTime={voteEndTime}
-                    userVotes={userVotes}
-                  />
+                  <Route path="/results" exact render={() => (
+                    <ResultPage
+                      proposals={proposalsList}
+                      web3Props={web3Props}
+                    />
+                  )} />
+
+                  <Route path="/settings" exact render={({ history })=>(
+                    <Advanced
+                      isVendor={this.state.isVendor && this.state.isVendor.isAllowed}
+                      buttonStyle={buttonStyle}
+                      address={account}
+                      balance={creditsBalance}
+                      changeView={this.changeView}
+                      privateKey={metaAccount.privateKey}
+                      changeAlert={this.changeAlert}
+                      currencyDisplay={this.currencyDisplay}
+                      tokenSendV2={tokenSendV2.bind(this)}
+                      metaAccount={this.state.metaAccount}
+                      setPossibleNewPrivateKey={this.setPossibleNewPrivateKey}
+                      history={history}
+                    />
+                  )} />
+
+                  <Route path="/burn" exact render={()=>(
+                    <BurnWallet
+                      mainStyle={mainStyle}
+                      address={account}
+                      balance={creditsBalance}
+                      goBack={() => this.props.history.go(-1) }
+                      currencyDisplay={this.currencyDisplay}
+                      burnWallet={()=>{
+                        burnMetaAccount(true);
+
+                        if(RNMessageChannel){
+                          RNMessageChannel.send("burn");
+                        }
+
+                        storeValues({
+                          loadedBlocksTop: "",
+                          metaPrivateKey: "",
+                          recentTxs: "",
+                          transactionsByAddress: "",
+                        }, this.state.account);
+
+                        this.setState({
+                          recentTxs: [],
+                          transactionsByAddress: {}
+                        });
+
+                        window.location.href = 'https://deora.earth/scan';
+                        return;
+                      }}
+                    />
+                  )} />
+
+                  <Route path="/proposal/:proposalId" render={({
+                    match: { params: { proposalId } },
+                    history
+                  }) => {
+                    console.log(proposalId);
+                    const proposal = (proposalsList || []).find(p => p.proposalId === proposalId);
+                    if (!proposal) {
+                      return 'Proposal not found';
+                    } else {
+                      const { voteStartTime, voteEndTime } = this.state;
+                      return (
+                        <ProposalPage
+                          web3Props={web3Props}
+                          favorite={favorites[proposalId]}
+                          toggleFavorites={this.toggleFavorites}
+                          proposal={proposal}
+                          trashBox={trashBox}
+                          creditsBalance={creditsBalance}
+                          goBack={() => history.replace('/')}
+                          changeAlert={this.changeAlert}
+                          updateVotes={this.updateVotes}
+                          voteEndTime={voteEndTime}
+                          voteStartTime={voteStartTime}
+                          history={history}
+                        />
+                      )
+                    }
+                  }} />
+
+                <Route render={() => (
+                  <Redirect to="/"/>
                 )} />
-
-                <Route path="/results" exact render={() => (
-                  <ResultPage
-                    proposals={proposalsList}
-                    web3Props={web3Props}
-                  />
-                )} />
-
-                <Route path="/settings" exact render={({ history })=>(
-                  <Advanced
-                    isVendor={this.state.isVendor && this.state.isVendor.isAllowed}
-                    buttonStyle={buttonStyle}
-                    address={account}
-                    balance={creditsBalance}
-                    changeView={this.changeView}
-                    privateKey={metaAccount.privateKey}
-                    changeAlert={this.changeAlert}
-                    currencyDisplay={this.currencyDisplay}
-                    tokenSendV2={tokenSendV2.bind(this)}
-                    metaAccount={this.state.metaAccount}
-                    setPossibleNewPrivateKey={this.setPossibleNewPrivateKey}
-                    history={history}
-                  />
-                )} />
-
-                <Route path="/burn" exact render={()=>(
-                  <BurnWallet
-                    mainStyle={mainStyle}
-                    address={account}
-                    balance={creditsBalance}
-                    goBack={() => this.props.history.go(-1) }
-                    currencyDisplay={this.currencyDisplay}
-                    burnWallet={()=>{
-                      burnMetaAccount(true);
-
-                      if(RNMessageChannel){
-                        RNMessageChannel.send("burn");
-                      }
-
-                      storeValues({
-                        loadedBlocksTop: "",
-                        metaPrivateKey: "",
-                        recentTxs: "",
-                        transactionsByAddress: "",
-                      }, this.state.account);
-
-                      this.setState({
-                        recentTxs: [],
-                        transactionsByAddress: {}
-                      });
-
-                      window.location.href = 'https://deora.earth/scan';
-                      return;
-                    }}
-                  />
-                )} />
-
-                <Route path="/proposal/:proposalId" render={({
-                  match: { params: { proposalId } },
-                  history
-                }) => {
-                  const proposal = (proposalsList || []).find(p => p.proposalId === proposalId);
-                  if (!proposal) {
-                    return 'Proposal not found';
-                  } else {
-                    const { voteStartTime, voteEndTime } = this.state;
-                    return (
-                      <ProposalPage
-                        web3Props={web3Props}
-                        favorite={favorites[proposalId]}
-                        toggleFavorites={this.toggleFavorites}
-                        proposal={proposal}
-                        trashBox={trashBox}
-                        creditsBalance={creditsBalance}
-                        goBack={() => history.replace('/')}
-                        changeAlert={this.changeAlert}
-                        updateVotes={this.updateVotes}
-                        voteEndTime={voteEndTime}
-                        voteStartTime={voteStartTime}
-                        history={history}
-                      />
-                    )
-                  }
-                }} />
-
-              <Route path="*" exact render={() => (
-                <Redirect to="/"/>
-              )} />
+              </Switch>
 
               {alert && <AlertBox alert={alert} changeAlert={this.changeAlert}/>}
             </MainContainer>
