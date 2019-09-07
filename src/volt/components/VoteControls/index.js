@@ -102,20 +102,18 @@ class VoteControls extends Component {
   setTokenNumber(event, lowerBound = 0) {
     const { target } = event;
     if (target && target.value < lowerBound) return;
-    this.setState(state => ({
-      ...state,
+    this.setState({
       votes: target.value
-    }));
+    });
   }
 
   setChoice({ value }) {
     const { choice, votes } = this.state;
     // if no decision yet, but slider is selected → preserve user's credits value
-    this.setState(state => ({
-      ...state,
+    this.setState({
       choice: value,
       votes: choice === '' && votes > 0 ? votes : 1,
-    }));
+    });
   }
 
   prepareScript() {
@@ -315,11 +313,10 @@ class VoteControls extends Component {
     const tree = new SMT(9, parsedTree);
     const proof = tree.createMerkleProof(motionId);
 
-    this.setState(state => ({
-      ...state,
+    this.setState({
       proof,
       castedVotes: newNumberOfVotes
-    }));
+    });
   }
 
   cookVoteParams(balanceCardId, prevVotes, newVotes) {
@@ -659,18 +656,16 @@ class VoteControls extends Component {
   }
 
   setProgressState(bool) {
-    this.setState(state => ({
-      ...state,
+    this.setState({
       showProgress: bool
-    }));
+    });
   }
 
   setReceiptState(bool, type = "") {
     const receipt = type ? "showWithdrawReceipt" : "showReceipt";
-    this.setState(state => ({
-      ...state,
+    this.setState({
       [receipt]: bool
-    }));
+    });
   }
 
   resetState() {
@@ -685,20 +680,14 @@ class VoteControls extends Component {
   }
 
   collapse() {
-    this.setState(state => {
-      return {
-        ...state,
-        expanded: false
-      };
+    this.setState({
+      expanded: false
     });
   }
 
   expand() {
-    this.setState(state => {
-      return {
-        ...state,
-        expand: true
-      };
+    this.setState({
+      expand: true
     });
   }
 
@@ -761,14 +750,13 @@ class VoteControls extends Component {
             onClick={() => {
               if (this.state.votes < max) {
                 this.setState(state => ({
-                  ...state,
                   votes: state.votes + 1,
-                }));  
+                }));
               };
             }}
             alreadyVoted={voteFormDisabled}
           />
-          <ActionButton 
+          <ActionButton
             disabled={voteBtnDisabled}
             onClick={this.submitOrUpdateVote}
             title={ noCredits ? 'Keine Voice Credits verfügbar' : ''}
