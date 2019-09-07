@@ -103,7 +103,7 @@ class VoteControls extends Component {
     const { target } = event;
     if (target && target.value < lowerBound) return;
     this.setState({
-      votes: target.value
+      votes: Number(target.value)
     });
   }
 

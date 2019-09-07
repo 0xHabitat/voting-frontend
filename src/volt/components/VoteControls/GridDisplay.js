@@ -48,7 +48,7 @@ const Cell = styled(Flex).attrs(() => ({
 `;
 
 export const GridDisplay = ({ label, value }) => {
-  const numbers = pad(value).split("");
+  const numbers = pad(value.toString()).split("");
   return (
     <GridContainer>
       <Label>{label}</Label>
