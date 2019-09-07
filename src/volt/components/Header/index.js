@@ -22,7 +22,10 @@ import { factor18 } from '../../utils';
 const BN = Web3.utils.BN;
 
 export const Header = props => {
-  const { credits, maxCredits = 25, openMenu } = props;
+  let { credits, maxCredits = 25, openMenu } = props;
+  if (maxCredits < 62) {
+    maxCredits = 62;
+  }
   let availableCredits = '--';
   if (credits) {
     availableCredits = new BN(credits).div(factor18).toString();
