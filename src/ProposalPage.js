@@ -26,7 +26,7 @@ const Container = styled(Flex).attrs({
 })`
   flex: 1;
   height: 100%;
-  
+
   // Enable smooth scrolling on mobile
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -84,22 +84,18 @@ export default function ProposalPage({
   const [showVoteControls, setShowVoteControls] = useState(null);
   const ref = useRef(null);
 
-  const onVoteControlOuterClick = () => {
-    setShowVoteControls(false);
-  };
-
-  const handleClickOutside = (event) => {
+  const handleClickOutside = React.useCallback((event) => {
     if (ref.current && ref.current.contains && !ref.current.contains(event.target)) {
-      onVoteControlOuterClick();
+      setShowVoteControls(false);
     }
-  }
+  }, [setShowVoteControls, ref])
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  });
+  }, [handleClickOutside]);
 
   return (
     <Container>
