@@ -44,7 +44,7 @@ const SortContols = props => {
         Votes
       </SortParam>
       <SortParam flex={1} onClick={sort("id")}>
-        Id
+        PA
       </SortParam>
       <SortParam reverse={true} onClick={sort("favorite")}>
         Favoriten
