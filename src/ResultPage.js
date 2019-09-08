@@ -121,7 +121,6 @@ export default function ResultPage({ proposals = [], web3Props }) {
               </VoteInfo>
               <Votes>
                 <Vote type={1}>{getYes(proposal)}</Vote>
-                <Vote type={-1}>{getNo(proposal)}</Vote>
               </Votes>
             </ProposalContainer>
           ))
