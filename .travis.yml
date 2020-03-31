@@ -35,7 +35,7 @@ deploy:
     acl: public_read
     local_dir: build
     skip_cleanup: true
-    region: "eu-west-1"
+    region: "eu-central-1"
     on:
       branch: ethturin
 
