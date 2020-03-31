@@ -27,6 +27,17 @@ deploy:
     region: "eu-west-1"
     on:
       branch: master
+  - provider: s3
+    cache_control: "max-age=31536000"
+    access_key_id: $aws_access_key_id
+    secret_access_key: $aws_secret_access_key
+    bucket: $prod_s3_bucket
+    acl: public_read
+    local_dir: build
+    skip_cleanup: true
+    region: "eu-west-1"
+    on:
+      branch: ethturin
 
 after_deploy:
   - aws configure set aws_access_key_id $aws_access_key_id
