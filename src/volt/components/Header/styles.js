@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Flex, Text, Image } from "rimble-ui";
 import logoDeora from "../../assets/logo-deora.png";
-import logoVolt from "../../assets/logo-volt-europa.png";
+import logoEthTurin from "../../assets/logo-eth-turin.png";
 import icnHamburger from "../../assets/icn-hamburger.svg";
 import icnSettings from "../../assets/icn-settings.svg";
 
@@ -39,19 +39,19 @@ export const LogoDeora = styled(Image).attrs(() => ({
 }))`
   background-color: transparent;
   width: auto;
-  height: 18px;
+  height: 14px;
   @media screen and (max-height: 600px){
     height: 15px;
   }
 `;
-export const LogoVolt = styled(Image).attrs(() => ({
-  src: logoVolt
+export const LogoEthTurin = styled(Image).attrs(() => ({
+  src: logoEthTurin
 }))`
   background-color: transparent;
   width: auto;
-  height: 22px;
+  height: 44px;
   position: relative;
-  top: 2px;
+  top: 12px;
   
   @media screen and (max-height: 600px){
     height: 17px;
