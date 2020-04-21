@@ -42,7 +42,7 @@ const configs = [
     }
   },
   {
-    DOMAINS: ["volt.deora.earth", "planeta.leap.rocks"],
+    DOMAINS: ["volt.deora.earth", "planeta.leap.rocks", "vote.ethturin.com"],
     CURRENCY: {
       EXCHANGE_RATE_QUERY: 5000,
       CURRENCY_LIST: ["EUR", "USD", "GBP"],
