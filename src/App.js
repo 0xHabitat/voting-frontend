@@ -32,6 +32,7 @@ import { fetchBalanceCard } from "./volt/utils";
 
 import MainPage from "./MainPage";
 import ProposalPage from "./ProposalPage";
+import FaucetPage from "./FaucetPage";
 import ResultPage from "./ResultPage";
 import Advanced from "./components/Advanced";
 import BurnWallet from './components/BurnWallet';
@@ -912,6 +913,12 @@ class App extends Component {
                   <Route path="/results" exact render={() => (
                     <ResultPage
                       proposals={proposalsList}
+                      web3Props={web3Props}
+                    />
+                  )} />
+
+                  <Route path="/faucet" exact render={() => (
+                    <FaucetPage
                       web3Props={web3Props}
                     />
                   )} />
