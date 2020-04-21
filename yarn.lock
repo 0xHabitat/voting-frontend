@@ -4856,9 +4856,9 @@ damerau-levenshtein@^1.0.0, damerau-levenshtein@^1.0.4:
   resolved "https://registry.yarnpkg.com/damerau-levenshtein/-/damerau-levenshtein-1.0.6.tgz#143c1641cb3d85c60c32329e26899adea8701791"
   integrity sha512-JVrozIeElnj3QzfUIt8tB8YMluBJom4Vw9qTPpjGYQ9fYlB3D/rb6OordUxf3xeFB35LKWs0xqcO5U6ySvBtug==
 
-dapparatus@leapdao/dapparatus#5591152:
+dapparatus@leapdao/dapparatus#8207d71:
   version "1.0.71"
-  resolved "https://codeload.github.com/leapdao/dapparatus/tar.gz/5591152ad7faf60378377bd7c5dd0923d7420070"
+  resolved "https://codeload.github.com/leapdao/dapparatus/tar.gz/8207d71c031859aaff046934e0817cc5aae573c4"
   dependencies:
     deepmerge "^2.1.1"
     idempotent-babel-polyfill "^7.0.0"
@@ -9950,15 +9950,16 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
-leap-core@^0.35.2:
-  version "0.35.2"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.35.2.tgz#d684666d38b200446612f0a2a6c1cc904428583a"
-  integrity sha512-g8N+d+8BoHTJm64/81j1bAxu2kv5bXm6o1rOGMYUNnoBwQvD1kF4Bv03Mc3thZO1JkD3PBvbeIehzVfxACWzpA==
+leap-core@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-2.0.0.tgz#e0ce5000bf77afd72f5a72236d6b80e82e8d3f19"
+  integrity sha512-DqbWSrYNz+ZGIROXfT7SBUC0FHon6rrv6I7RCrxbzqjDsHHh6lmpMW6v+kkJtYYRe6TkalxPZMz0HRgo+ndtbw==
   dependencies:
     "@types/web3" "^1.0.18"
     ethereumjs-util "6.0.0"
     jsbi-utils "^1.0.0"
     node-fetch "^2.3.0"
+    web3-core-promievent "^1.2.4"
 
 left-pad@^1.3.0:
   version "1.3.0"
@@ -16324,7 +16325,7 @@ web3-core-promievent@1.0.0-beta.36:
     any-promise "1.3.0"
     eventemitter3 "1.1.1"
 
-web3-core-promievent@1.2.6:
+web3-core-promievent@1.2.6, web3-core-promievent@^1.2.4:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3-core-promievent/-/web3-core-promievent-1.2.6.tgz#b1550a3a4163e48b8b704c1fe4b0084fc2dad8f5"
   integrity sha512-km72kJef/qtQNiSjDJJVHIZvoVOm6ytW3FCYnOcCs7RIkviAb5JYlPiye0o4pJOLzCXYID7DK7Q9bhY8qWb1lw==

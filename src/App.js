@@ -821,11 +821,9 @@ class App extends Component {
       trashAddress
     } = body;
 
-    // ToDo: remove second filter when store won't have any duplicate proposalId
     const proposals = proposalsList
       .map((p,i)=>({...p, id: i }))
-      .filter(p => p.proposalId)
-      .filter((p, i, list) => list.findIndex(p2 => p2.proposalId === p.proposalId) === i);
+      .filter(p => p.proposalId && p.id > 18); // don't show volt proposals
 
     this.setState(state => ({
       proposalsList: proposals,

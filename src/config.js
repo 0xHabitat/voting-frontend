@@ -13,7 +13,7 @@ const configs = [
       DAI_SHORTNAME: "GÖLR",
       MARKET_MAKER:
         "https://2nuxsb25he.execute-api.eu-west-1.amazonaws.com/testnet",
-      BRIDGE_ADDRESS: "0x26a937302cc6A0A7334B210de06136C8C61BA885",
+      BRIDGE_ADDRESS: "0xC449D4CD1dEc611d8cA5Fd8167Bf46d6e6d345b9",
       EXPLORER: {
         URL: "https://testnet.leapdao.org/explorer/",
         NAME: "LeapDAO Testnet Explorer"
@@ -56,7 +56,7 @@ const configs = [
       DAI_SHORTNAME: "GÖLR",
       MARKET_MAKER:
         "https://2nuxsb25he.execute-api.eu-west-1.amazonaws.com/testnet",
-      BRIDGE_ADDRESS: "0x26a937302cc6A0A7334B210de06136C8C61BA885",
+      BRIDGE_ADDRESS: "0xC449D4CD1dEc611d8cA5Fd8167Bf46d6e6d345b9",
       EXPLORER: {
         URL: "https://testnet.leapdao.org/explorer/",
         NAME: "LeapDAO Testnet Explorer"
