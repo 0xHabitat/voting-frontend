@@ -28,7 +28,7 @@ const configs = [
       }
     },
     ROOTCHAIN: {
-      RPC: "https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+      RPC: "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0xD2D0F8a6ADfF16C2098101087f9548465EC96C98",
       GAS: {
         BOOST_BY: 0.25
@@ -71,7 +71,7 @@ const configs = [
       }
     },
     ROOTCHAIN: {
-      RPC: "https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+      RPC: "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0xD2D0F8a6ADfF16C2098101087f9548465EC96C98",
       GAS: {
         BOOST_BY: 0.25
@@ -114,7 +114,7 @@ const configs = [
       }
     },
     ROOTCHAIN: {
-      RPC: "https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+      RPC: "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0xD2D0F8a6ADfF16C2098101087f9548465EC96C98",
       GAS: {
         BOOST_BY: 0.25
@@ -155,7 +155,7 @@ const configs = [
       }
     },
     ROOTCHAIN: {
-      RPC: "https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+      RPC: "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0xD2D0F8a6ADfF16C2098101087f9548465EC96C98",
       GAS: {
         BOOST_BY: 0.25

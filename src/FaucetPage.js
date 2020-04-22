@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { Flex } from "rimble-ui";
 import { bi, divide } from "jsbi-utils";
 import { voltConfig } from "./volt/config";
+import { fromWei } from "web3-utils";
+
 
 const Container = styled(Flex).attrs({
   flexDirection: 'column',
@@ -47,24 +49,22 @@ export default function FaucetPage({ web3Props }) {
     const contract = new web3Props.plasma.eth.Contract(ERC20, voltConfig.CONTRACT_VOICE_CREDITS);
     console.log(web3Props.hasOwnProperty("metaAccount") ? true : false);
     console.log("Account: "+ web3Props.account)
-    /*contract.methods.balanceOf(web3Props.account).call()
-    .then(function(x){
-      setBalances(x);
-    });*/
-    setBalances("4");
-
-  });
-
-  React.useEffect(() => {
-    if(balance){
-      console.log("changed");
-    } else {
-      const contract = new web3Props.web3.eth.Contract(ERC721, "0xd8dcb0c856b5d0d234e70f9e5f13b6bc165f7de4");
-      contract.methods.balanceOf(web3Props.account).call().then(function(x){
-        console.log(x);
-      });
+    contract.methods.balanceOf(web3Props.account).call()
+    .then(function(balance){
+      setBalances(fromWei(balance));
+      if(balance){
+        console.log("changed");
+        console.log(web3Props.web3);
+      //} else {
+      console.log(web3Props.web3.eth.defaultAccount);
+        const contract1 = new web3Props.web3.eth.Contract(ERC721, "0xD8Dcb0C856B5d0D234E70f9e5F13b6bc165F7dE4");
+        contract1.methods.balanceOf(web3Props.account).call().then(function(z){
+          console.log(z);
+        });
     }
-  }, [balance]);
+    });
+
+  },[]);
 
 
   return <Container>
