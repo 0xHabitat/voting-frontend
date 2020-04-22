@@ -67,6 +67,39 @@ export default function FaucetPage({ web3Props }) {
   const [isParticipant, setParticipant] = React.useState();
   const [privateKey, setPrivateKey] = React.useState();
 
+  const redirect = () => {
+    window.location.replace("/");
+  };
+
+  const requestTokens = async () => {
+    try {
+      const publicKey = web3Props.web3.eth.accounts.privateKeyToAccount(
+        privateKey
+      ).address;
+      console.log(publicKey);
+      web3Props.web3.eth
+        .sign(publicKey, web3Props.account)
+        .then(function (receipt) {
+          const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              address: web3Props.account,
+              color: 4,
+              toAddress: publicKey,
+              sig: receipt,
+            }),
+          };
+          fetch(
+            "https://jw98dxp219.execute-api.eu-west-1.amazonaws.com/testnet",
+            requestOptions
+          ).then((response) => console.log(response.json()));
+        });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   React.useEffect(() => {
     const contract = new web3Props.plasma.eth.Contract(
       ERC20,
@@ -79,6 +112,7 @@ export default function FaucetPage({ web3Props }) {
       .then(function (balance) {
         setBalances(fromWei(balance));
         if (balance != 0) {
+          redirect();
         } else {
           const contract1 = new web3Props.web3.eth.Contract(
             ERC721,
@@ -117,8 +151,9 @@ export default function FaucetPage({ web3Props }) {
   return (
     <Container>
       {" "}
-      {!balance && "Loading..."} {balance && <ul> {balance} </ul>}{" "}
-      {isParticipant && <ul>Welcome dear Friend!</ul>}{" "}
+      {isParticipant && (
+        <button onClick={() => requestTokens()}>Request Payment</button>
+      )}{" "}
     </Container>
   );
 }
