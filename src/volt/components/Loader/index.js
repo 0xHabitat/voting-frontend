@@ -1,13 +1,13 @@
 import React from 'react'
 import { FullScreenContainer } from "../Common";
-import { DeoraLogo } from "../Menu/styles";
-import { ProgressBar, LoaderContainer} from "./styles";
+import { LoaderContainer, LoadingLogo } from "./styles";
+import ProgressBar from "./progressBar";
 
 const Loader = () => {
   return(
     <FullScreenContainer>
       <LoaderContainer>
-        <DeoraLogo mb={5} animated/>
+        <LoadingLogo/>
         <ProgressBar/>
       </LoaderContainer>
     </FullScreenContainer>

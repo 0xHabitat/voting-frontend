@@ -6,7 +6,7 @@ import {
   TopContainer,
   LogoContainer,
   LogoDeora,
-  LogoVolt,
+  LogoEthTurin,
   LogoPadding,
   Actions,
   Settings,
@@ -37,7 +37,7 @@ export const Header = props => {
           <LogoContainer>
             <LogoDeora/>
             <LogoPadding>x</LogoPadding>
-            <LogoVolt/>
+            <LogoEthTurin/>
           </LogoContainer>
         </Link>
         <Actions>

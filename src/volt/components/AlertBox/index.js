@@ -14,7 +14,7 @@ const AlertBox = styled(Flex).attrs({
       case "fail":
         return "#FF2C14";
       default:
-        return "#582C83";
+        return "#000000";
     }
   }};
 `;
