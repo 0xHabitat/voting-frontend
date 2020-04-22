@@ -4,6 +4,7 @@ import { Flex } from "rimble-ui";
 import { bi, divide } from "jsbi-utils";
 import { voltConfig } from "./volt/config";
 import { fromWei } from "web3-utils";
+import QRCodeFaucet from "./volt/components/QRCodeFaucet";
 
 const Container = styled(Flex).attrs({
   flexDirection: "column",
@@ -65,6 +66,7 @@ const ERC20 = [
 export default function FaucetPage({ web3Props }) {
   const [balance, setBalances] = React.useState();
   const [isParticipant, setParticipant] = React.useState();
+  const [hasRequested, setRequested] = React.useState();
   const [privateKey, setPrivateKey] = React.useState();
 
   const redirect = () => {
@@ -93,7 +95,10 @@ export default function FaucetPage({ web3Props }) {
           fetch(
             "https://jw98dxp219.execute-api.eu-west-1.amazonaws.com/testnet",
             requestOptions
-          ).then((response) => console.log(response.json()));
+          ).then((response) => {
+            console.log(response.json());
+            localStorage.setItem("requested-faucet", true);
+          });
         });
     } catch (err) {
       console.error(err);
@@ -114,6 +119,11 @@ export default function FaucetPage({ web3Props }) {
         if (balance != 0) {
           redirect();
         } else {
+          if (localStorage.getItem("requested-faucet")) {
+            setRequested(true);
+            return;
+          }
+
           const contract1 = new web3Props.web3.eth.Contract(
             ERC721,
             "0xD8Dcb0C856B5d0D234E70f9e5F13b6bc165F7dE4"
@@ -151,9 +161,10 @@ export default function FaucetPage({ web3Props }) {
   return (
     <Container>
       {" "}
-      {isParticipant && (
-        <button onClick={() => requestTokens()}>Request Payment</button>
+      {isParticipant && !hasRequested && (
+        <button onClick={() => requestTokens()}>Request Voice Tokens</button>
       )}{" "}
+      {hasRequested && <QRCodeFaucet privateKey={privateKey}></QRCodeFaucet>}
     </Container>
   );
 }
