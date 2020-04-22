@@ -5,7 +5,7 @@ import { Flex, Text, Image } from "rimble-ui";
 import { FullScreenContainer } from "../Common";
 import { DeoraLogo } from "../Menu/styles";
 
-import voteYes from "../../assets/vote-yes.png";
+import VoteYes from "./voteYes";
 import voteNo from "../../assets/vote-no.png";
 import voteAccepted from '../../assets/vote-accepted.svg';
 import witdrawImage from "../../assets/icn-withdraw.svg";
@@ -109,21 +109,19 @@ const ReceiptField = ({ label, value }) => {
 
 export const Receipt = props => {
   const { voteType, votes = 0, onClose } = props;
-  const voteImage = voteType === "yes" ? voteYes : voteNo;
   return (
     <FullScreenContainer>
       <Container>
-        <Title>Deine Quittung</Title>
+        <Title>Your Receipt</Title>
         <MiddlePart>
-          <Graphic src={voteImage} width={"210px"} mb="4rem" />
+          <VoteYes />
           <ReceiptInfo>
-            <ReceiptField label="Dein Vote" value={voteType} />
-            <ReceiptField label="Anzahl an Votes" value={votes.toString()} />
+            <ReceiptField label="Your Vote" value={voteType} />
+            <ReceiptField label="Number of Votes" value={votes.toString()} />
             <ReceiptField label="Voicecredits" value={votes.mul(votes).toString()} />
           </ReceiptInfo>
-          <Graphic src={voteAccepted} width={"6rem"} />
         </MiddlePart>
-        <ActionClose onClick={onClose}>Schließen</ActionClose>
+        <ActionClose onClick={onClose}>Close</ActionClose>
       </Container>
     </FullScreenContainer>
   );

@@ -698,7 +698,7 @@ class VoteControls extends Component {
 
     const votes = new BN(voteStr);
     const options = [
-      { value: "yes", label: "Vote setzen", color: "voltBrandGreen" }
+      { value: "yes", label: "Place your Vote", color: "voltBrandGreen" }
     ];
     const castedCredits = castedVotes.mul(castedVotes).div(factor18);
 
@@ -760,7 +760,7 @@ class VoteControls extends Component {
             onClick={this.submitOrUpdateVote}
             title={ noCredits ? 'Keine Voice Credits verfügbar' : ''}
           >
-            { alreadyVoted ? 'Vote Ändern' : 'Vote Senden' }
+            { alreadyVoted ? 'Vote Ändern' : 'Send your vote' }
           </ActionButton>
           {alreadyVoted && <ActionButton onClick={this.withdrawVote}>Zurücksetzen</ActionButton>}
         </SubContainer>
