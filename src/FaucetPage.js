@@ -9,7 +9,6 @@ import { fromWei } from "web3-utils";
 import QRCodeFaucet from "./volt/components/QRCodeFaucet";
 let base64url = require("base64url");
 
-
 const MainContainer = styled.div`
   position: fixed;
   top: 0;
@@ -148,7 +147,7 @@ export default function FaucetPage({ web3Props }) {
       .call()
       .then(function (balance) {
         setBalances(fromWei(balance));
-        if (balance = 0) {
+        if ((balance = 0)) {
           redirect();
         } else {
           var localStor = false;
@@ -192,12 +191,12 @@ export default function FaucetPage({ web3Props }) {
   }, []);
 
   return (
-
     <MainContainer>
-      <LoadingLogo/>
-      {" "}
+      {!hasRequested && <LoadingLogo />}{" "}
       {isParticipant && !hasRequested && (
-        <RequestButton onClick={() => requestTokens()}>Request Voice Tokens</RequestButton>
+        <RequestButton onClick={() => requestTokens()}>
+          Request Voice Tokens
+        </RequestButton>
       )}{" "}
       {faucetError && <div>{faucetError} Please message us on Discord.</div>}
       {!faucetError && privateKey && hasRequested && (
