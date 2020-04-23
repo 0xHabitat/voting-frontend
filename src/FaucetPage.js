@@ -89,6 +89,7 @@ export default function FaucetPage({ web3Props }) {
   const [isParticipant, setParticipant] = React.useState();
   const [hasRequested, setRequested] = React.useState();
   const [privateKey, setPrivateKey] = React.useState();
+  const [faucetError, setFaucetError] = React.useState();
 
   function pkToUrl(pk) {
     return base64url(web3Props.web3.utils.hexToBytes(pk));
@@ -103,7 +104,7 @@ export default function FaucetPage({ web3Props }) {
         privateKey
       ).address;
       web3Props.web3.eth.personal
-        .sign(votingAddress.replace('0x',''), web3Props.account)
+        .sign(votingAddress.replace("0x", ""), web3Props.account)
         .then(function (receipt) {
           const requestOptions = {
             method: "POST",
@@ -116,11 +117,16 @@ export default function FaucetPage({ web3Props }) {
             }),
           };
           fetch(
-            "https://jw98dxp219.execute-api.eu-west-1.amazonaws.com/testnet",
+            "https://jw98dxp219.execute-api.eu-west-1.amazonaws.com/testnet/address",
             requestOptions
           ).then((response) => {
-            console.log(response.json());
-            //localStorage.setItem("requested-faucet", true);
+            const statusCode = response.status;
+            if (statusCode == 200) {
+              localStorage.setItem("requested-faucet", true);
+            } else {
+              setFaucetError(response.json().errorMessage);
+            }
+            setRequested(true);
           });
         });
     } catch (err) {
@@ -155,7 +161,6 @@ export default function FaucetPage({ web3Props }) {
             .balanceOf(web3Props.account)
             .call()
             .then(function (amount) {
-              console.log(amount);
               if (amount > 0) {
                 setParticipant(true);
                 var localStor = false;
@@ -189,7 +194,8 @@ export default function FaucetPage({ web3Props }) {
       {isParticipant && !hasRequested && (
         <RequestButton onClick={() => requestTokens()}>Request Voice Tokens</RequestButton>
       )}{" "}
-      {hasRequested && privateKey && (
+      {faucetError && <div>{faucetError} Please message us on Discord.</div>}
+      {!faucetError && hasRequested && privateKey && (
         <QRCodeFaucet privateKey={pkToUrl(privateKey)}></QRCodeFaucet>
       )}
     </MainContainer>
