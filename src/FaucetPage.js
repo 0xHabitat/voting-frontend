@@ -3,20 +3,40 @@ import styled from "styled-components";
 import { Flex } from "rimble-ui";
 import { bi, divide } from "jsbi-utils";
 import { voltConfig } from "./volt/config";
+import { FullScreenContainer } from "./volt/components/Common";
+import { LoadingLogo } from "./volt/components/Loader/styles";
 import { fromWei } from "web3-utils";
 import QRCodeFaucet from "./volt/components/QRCodeFaucet";
 let base64url = require("base64url");
 
-const Container = styled(Flex).attrs({
-  flexDirection: "column",
-})`
-  flex: 1;
-  height: 100%;
 
-  ul {
-    height: 100%;
-    overflow-y: auto;
-    padding: 0;
+const MainContainer = styled.div`
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 5;
+  background-color: #000000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const RequestButton = styled.button.attrs(() => ({}))`
+  color: ${({ theme }) => theme.colors.voltBrandMain};
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  margin-top: 65px;
+  padding: 5px 10px;
+  border: 3px solid white;
+  border-radius: 8px;
+  background-color: white;
+  &:disabled {
+    opacity: 0.3;
   }
 `;
 
@@ -119,7 +139,7 @@ export default function FaucetPage({ web3Props }) {
       .call()
       .then(function (balance) {
         setBalances(fromWei(balance));
-        if (balance != 0) {
+        if (balance = 0) {
           redirect();
         } else {
           if (localStorage.getItem("requested-faucet")) {
@@ -162,14 +182,16 @@ export default function FaucetPage({ web3Props }) {
   }, []);
 
   return (
-    <Container>
+
+    <MainContainer>
+      <LoadingLogo/>
       {" "}
       {isParticipant && !hasRequested && (
-        <button onClick={() => requestTokens()}>Request Voice Tokens</button>
+        <RequestButton onClick={() => requestTokens()}>Request Voice Tokens</RequestButton>
       )}{" "}
       {hasRequested && privateKey && (
         <QRCodeFaucet privateKey={pkToUrl(privateKey)}></QRCodeFaucet>
       )}
-    </Container>
+    </MainContainer>
   );
 }
