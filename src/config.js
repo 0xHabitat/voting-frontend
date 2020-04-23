@@ -1,9 +1,15 @@
 const configs = [
   {
-    DOMAINS: ["localhost", "10.0.0.107", "sundai.fritz.box", /192\.168\..*/, /.*\.ngrok\.io/],
+    DOMAINS: [
+      "localhost",
+      "10.0.0.107",
+      "sundai.fritz.box",
+      /192\.168\..*/,
+      /.*\.ngrok\.io/,
+    ],
     CURRENCY: {
       CURRENCY_LIST: ["USD", "EUR", "GBP"],
-      DEFAULT_CURRENCY: "USD"
+      DEFAULT_CURRENCY: "USD",
     },
     SIDECHAIN: {
       NAME: "Leap Testnet",
@@ -16,7 +22,7 @@ const configs = [
       BRIDGE_ADDRESS: "0xC449D4CD1dEc611d8cA5Fd8167Bf46d6e6d345b9",
       EXPLORER: {
         URL: "https://testnet.leapdao.org/explorer/",
-        NAME: "LeapDAO Testnet Explorer"
+        NAME: "LeapDAO Testnet Explorer",
       },
       TIME_ESTIMATES: {
         // TODO: For Plasma implementations, EXIT (and specifically fast exits)
@@ -25,28 +31,29 @@ const configs = [
         EXIT: 160000,
         DEPOSIT: 330000,
         TX: 5000,
-      }
+      },
     },
     ROOTCHAIN: {
-      RPC: "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+      RPC:
+        "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0xD2D0F8a6ADfF16C2098101087f9548465EC96C98",
       GAS: {
-        BOOST_BY: 0.25
+        BOOST_BY: 0.25,
       },
       TIME_ESTIMATES: {
-        SEND: 160000
+        SEND: 160000,
       },
       UNISWAP: {
-        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14"
-      }
-    }
+        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14",
+      },
+    },
   },
   {
     DOMAINS: ["volt.deora.earth", "planeta.leap.rocks", "vote.ethturin.com"],
     CURRENCY: {
       EXCHANGE_RATE_QUERY: 5000,
       CURRENCY_LIST: ["EUR", "USD", "GBP"],
-      DEFAULT_CURRENCY: "USD"
+      DEFAULT_CURRENCY: "USD",
     },
     SIDECHAIN: {
       NAME: "Leap Testnet",
@@ -59,7 +66,7 @@ const configs = [
       BRIDGE_ADDRESS: "0xC449D4CD1dEc611d8cA5Fd8167Bf46d6e6d345b9",
       EXPLORER: {
         URL: "https://testnet.leapdao.org/explorer/",
-        NAME: "LeapDAO Testnet Explorer"
+        NAME: "LeapDAO Testnet Explorer",
       },
       TIME_ESTIMATES: {
         // TODO: For Plasma implementations, EXIT (and specifically fast exits)
@@ -68,28 +75,29 @@ const configs = [
         EXIT: 160000,
         DEPOSIT: 330000,
         TX: 1000,
-      }
+      },
     },
     ROOTCHAIN: {
-      RPC: "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+      RPC:
+        "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0xD2D0F8a6ADfF16C2098101087f9548465EC96C98",
       GAS: {
-        BOOST_BY: 0.25
+        BOOST_BY: 0.25,
       },
       TIME_ESTIMATES: {
-        SEND: 160000
+        SEND: 160000,
       },
       UNISWAP: {
-        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14"
-      }
-    }
+        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14",
+      },
+    },
   },
   {
     DOMAINS: ["toco2.leap.rocks"],
     CURRENCY: {
       EXCHANGE_RATE_QUERY: 5000,
       CURRENCY_LIST: ["EUR", "USD", "GBP"],
-      DEFAULT_CURRENCY: "USD"
+      DEFAULT_CURRENCY: "USD",
     },
     SIDECHAIN: {
       NAME: "Leap Testnet",
@@ -102,7 +110,7 @@ const configs = [
       BRIDGE_ADDRESS: "0x26a937302cc6A0A7334B210de06136C8C61BA885",
       EXPLORER: {
         URL: "https://testnet.leapdao.org/explorer/",
-        NAME: "LeapDAO Testnet Explorer"
+        NAME: "LeapDAO Testnet Explorer",
       },
       TIME_ESTIMATES: {
         // TODO: For Plasma implementations, EXIT (and specifically fast exits)
@@ -111,28 +119,29 @@ const configs = [
         EXIT: 160000,
         DEPOSIT: 330000,
         TX: 1000,
-      }
+      },
     },
     ROOTCHAIN: {
-      RPC: "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+      RPC:
+        "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0xD2D0F8a6ADfF16C2098101087f9548465EC96C98",
       GAS: {
-        BOOST_BY: 0.25
+        BOOST_BY: 0.25,
       },
       TIME_ESTIMATES: {
-        SEND: 160000
+        SEND: 160000,
       },
       UNISWAP: {
-        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14"
-      }
-    }
+        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14",
+      },
+    },
   },
   {
     DOMAINS: ["s.peep.cash"],
     CURRENCY: {
       EXCHANGE_RATE_QUERY: 5000,
       CURRENCY_LIST: ["EUR", "USD", "GBP"],
-      DEFAULT_CURRENCY: "USD"
+      DEFAULT_CURRENCY: "USD",
     },
     SIDECHAIN: {
       NAME: "Leap Testnet",
@@ -143,7 +152,7 @@ const configs = [
       BRIDGE_ADDRESS: "0x26a937302cc6A0A7334B210de06136C8C61BA885",
       EXPLORER: {
         URL: "https://testnet.leapdao.org/explorer/",
-        NAME: "LeapDAO Testnet Explorer"
+        NAME: "LeapDAO Testnet Explorer",
       },
       TIME_ESTIMATES: {
         // TODO: For Plasma implementations, EXIT (and specifically fast exits)
@@ -152,28 +161,29 @@ const configs = [
         EXIT: 160000,
         DEPOSIT: 330000,
         TX: 1000,
-      }
+      },
     },
     ROOTCHAIN: {
-      RPC: "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+      RPC:
+        "https://cors-anywhere.herokuapp.com/https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0xD2D0F8a6ADfF16C2098101087f9548465EC96C98",
       GAS: {
-        BOOST_BY: 0.25
+        BOOST_BY: 0.25,
       },
       TIME_ESTIMATES: {
-        SEND: 160000
+        SEND: 160000,
       },
       UNISWAP: {
-        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14"
-      }
-    }
+        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14",
+      },
+    },
   },
   {
     DOMAINS: ["sundai.io"],
     CURRENCY: {
       EXCHANGE_RATE_QUERY: 5000,
       CURRENCY_LIST: ["EUR", "USD", "GBP"],
-      DEFAULT_CURRENCY: "USD"
+      DEFAULT_CURRENCY: "USD",
     },
     SIDECHAIN: {
       NAME: "Leap Network",
@@ -184,7 +194,7 @@ const configs = [
       BRIDGE_ADDRESS: "0x0036192587fD788B75829fbF79BE7F06E4F23B21",
       EXPLORER: {
         URL: "https://mainnet.leapdao.org/explorer/",
-        NAME: "LeapDAO Mainnet Explorer"
+        NAME: "LeapDAO Mainnet Explorer",
       },
       TIME_ESTIMATES: {
         // TODO: For Plasma implementations, EXIT (and specifically fast exits)
@@ -193,28 +203,28 @@ const configs = [
         EXIT: 160000,
         DEPOSIT: 330000,
         TX: 1000,
-      }
+      },
     },
     ROOTCHAIN: {
       RPC: "wss://mainnet.infura.io/ws/v3/f039330d8fb747e48a7ce98f51400d65",
       DAI_ADDRESS: "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359",
       GAS: {
-        BOOST_BY: 0.25
+        BOOST_BY: 0.25,
       },
       TIME_ESTIMATES: {
-        SEND: 160000
+        SEND: 160000,
       },
       UNISWAP: {
-        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14"
-      }
-    }
-  }
+        DAI_ETH_ADDRESS: "0x09cabec1ead1c0ba254b09efb3ee13841712be14",
+      },
+    },
+  },
 ];
 
 function findConfig(hostname) {
   return configs.filter(
     ({ DOMAINS }) =>
-      DOMAINS.filter(domain =>
+      DOMAINS.filter((domain) =>
         domain instanceof RegExp ? domain.exec(hostname) : domain === hostname
       ).length
   );

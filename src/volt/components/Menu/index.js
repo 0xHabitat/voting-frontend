@@ -9,12 +9,11 @@ const Menu = ({ onClose, account, voteEndTime }) => (
     <Container>
       <DeoraLogo />
       <MenuItems>
-        <Item href="https://www.deora.earth/volt-platform/about">Über uns</Item>
-        <Item href="https://www.deora.earth/volt-platform/quadratic">Quadratical Voting</Item>
-        <Item href="https://www.deora.earth/volt-platform/blockchain">Die Blockchain</Item>
-        <Item href="https://www.deora.earth/volt-platform/privacy">Sicherheit & Privacy</Item>
-        <Item href="https://www.deora.earth/volt-platform/extra-proposals">Weitere Anträge</Item>
-        {dayjs().isAfter(voteEndTime) && <Item target="_blank" href="https://volt.deora.earth/results">Wahlergebnisse</Item>}
+        <Item href="https://ethturin.com/">ETH TURIN</Item>
+        <Item href="https://ethturin.com/agenda">Agenda</Item>
+        <Item href="https://ethturin.com/tracks">The tracks</Item>
+        <Item href="https://vote.ethturin.com/faucet ">Faucet for Voice Credits</Item>
+        {dayjs().isAfter(voteEndTime) && <Item target="_blank" href="https://vote.ethturin.com/results">Results</Item>}
       </MenuItems>
       <AccountDetails>
         <Label>Your Account Address:</Label>

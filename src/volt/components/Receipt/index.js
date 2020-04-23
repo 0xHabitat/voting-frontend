@@ -108,7 +108,7 @@ const ReceiptField = ({ label, value }) => {
 };
 
 export const Receipt = props => {
-  const { voteType, votes = 0, onClose } = props;
+  const { votes = 0, onClose } = props;
   return (
     <FullScreenContainer>
       <Container>
@@ -116,8 +116,7 @@ export const Receipt = props => {
         <MiddlePart>
           <VoteYes />
           <ReceiptInfo>
-            <ReceiptField label="Your Vote" value={voteType} />
-            <ReceiptField label="Number of Votes" value={votes.toString()} />
+            <ReceiptField label="Number of Upvotes" value={votes.toString()} />
             <ReceiptField label="Voicecredits" value={votes.mul(votes).toString()} />
           </ReceiptInfo>
         </MiddlePart>
@@ -136,7 +135,7 @@ export const WithdrawReceipt = props => {
         <MiddlePart>
           <Graphic src={witdrawImage} width={"30vw"} mb="4rem" />
           <ReceiptText>
-            DEIN VOTE WURDE ERFOLGREICH ZURÜCKGESETZT
+            YOUR VOTE HAS BEEN SUCCESSFULLY WITHDRAWN
           </ReceiptText>
         </MiddlePart>
         <ActionClose onClick={onClose}>Schließen</ActionClose>
