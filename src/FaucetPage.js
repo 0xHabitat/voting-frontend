@@ -75,21 +75,19 @@ export default function FaucetPage({ web3Props }) {
 
   const requestTokens = async () => {
     try {
-      const publicKey = web3Props.web3.eth.accounts.privateKeyToAccount(
+      const votingAddress = web3Props.web3.eth.accounts.privateKeyToAccount(
         privateKey
       ).address;
-      console.log(publicKey);
       web3Props.web3.eth.personal
-        .sign(web3Props.web3.utils.sha3(publicKey), web3Props.account)
+        .sign(web3Props.web3.utils.sha3(votingAddress), web3Props.account)
         .then(function (receipt) {
-          console.log(receipt);
           const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               address: web3Props.account,
               color: 4,
-              toAddress: publicKey,
+              toAddress: votingAddress,
               sig: receipt,
             }),
           };
