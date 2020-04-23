@@ -5,6 +5,7 @@ import { bi, divide } from "jsbi-utils";
 import { voltConfig } from "./volt/config";
 import { fromWei } from "web3-utils";
 import QRCodeFaucet from "./volt/components/QRCodeFaucet";
+let base64url = require("base64url");
 
 const Container = styled(Flex).attrs({
   flexDirection: "column",
@@ -69,6 +70,9 @@ export default function FaucetPage({ web3Props }) {
   const [hasRequested, setRequested] = React.useState();
   const [privateKey, setPrivateKey] = React.useState();
 
+  function pkToUrl(pk) {
+    return base64url(web3Props.web3.utils.hexToBytes(pk));
+  }
   const redirect = () => {
     window.location.replace("/");
   };
@@ -163,7 +167,9 @@ export default function FaucetPage({ web3Props }) {
       {isParticipant && !hasRequested && (
         <button onClick={() => requestTokens()}>Request Voice Tokens</button>
       )}{" "}
-      {hasRequested && <QRCodeFaucet privateKey={privateKey}></QRCodeFaucet>}
+      {hasRequested && privateKey && (
+        <QRCodeFaucet privateKey={pkToUrl(privateKey)}></QRCodeFaucet>
+      )}
     </Container>
   );
 }
