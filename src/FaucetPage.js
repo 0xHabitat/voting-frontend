@@ -83,7 +83,7 @@ export default function FaucetPage({ web3Props }) {
         privateKey
       ).address;
       web3Props.web3.eth.personal
-        .sign(web3Props.web3.utils.sha3(votingAddress), web3Props.account)
+        .sign(votingAddress.replace('0x',''), web3Props.account)
         .then(function (receipt) {
           const requestOptions = {
             method: "POST",
