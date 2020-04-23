@@ -79,9 +79,10 @@ export default function FaucetPage({ web3Props }) {
         privateKey
       ).address;
       console.log(publicKey);
-      web3Props.web3.eth
-        .sign(publicKey, web3Props.account)
+      web3Props.web3.eth.personal
+        .sign(web3Props.web3.utils.sha3(publicKey), web3Props.account)
         .then(function (receipt) {
+          console.log(receipt);
           const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -97,7 +98,7 @@ export default function FaucetPage({ web3Props }) {
             requestOptions
           ).then((response) => {
             console.log(response.json());
-            localStorage.setItem("requested-faucet", true);
+            //localStorage.setItem("requested-faucet", true);
           });
         });
     } catch (err) {
