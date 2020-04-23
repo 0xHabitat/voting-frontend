@@ -49,8 +49,8 @@ const QRCodeFaucet = ({ privateKey }) => (
       <p>
         <b>We have generated and funded your voting account.</b> <br />
         <Attention>
-          Please scan the QR code or click the link with a <br /> non-web3
-          browser (no metamask).
+          Please scan the QR code or open the link in a <br /> non-web3
+          browser (no metamask). Keep it a SECRET, as it protects your voice!
         </Attention>
       </p>
       <QRCodeWrapper>
