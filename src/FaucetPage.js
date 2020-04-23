@@ -84,7 +84,7 @@ export default function FaucetPage({ web3Props }) {
         privateKey
       ).address;
       web3Props.web3.eth.personal
-        .sign(votingAddress.replace('0x',''), web3Props.account)
+        .sign(votingAddress.replace("0x", ""), web3Props.account)
         .then(function (receipt) {
           const requestOptions = {
             method: "POST",
@@ -97,11 +97,16 @@ export default function FaucetPage({ web3Props }) {
             }),
           };
           fetch(
-            "https://jw98dxp219.execute-api.eu-west-1.amazonaws.com/testnet",
+            "https://jw98dxp219.execute-api.eu-west-1.amazonaws.com/testnet/address",
             requestOptions
           ).then((response) => {
-            console.log(response.json());
-            //localStorage.setItem("requested-faucet", true);
+            const statusCode = response.status;
+            if (statusCode == 200) {
+              localStorage.setItem("requested-faucet", true);
+            } else {
+              setFaucetEmpty(true);
+            }
+            setRequested(true);
           });
         });
     } catch (err) {
