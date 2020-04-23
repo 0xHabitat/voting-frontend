@@ -69,6 +69,7 @@ export default function FaucetPage({ web3Props }) {
   const [isParticipant, setParticipant] = React.useState();
   const [hasRequested, setRequested] = React.useState();
   const [privateKey, setPrivateKey] = React.useState();
+  const [faucetEmpty, setFaucetEmpty] = React.useState();
 
   function pkToUrl(pk) {
     return base64url(web3Props.web3.utils.hexToBytes(pk));
@@ -167,7 +168,10 @@ export default function FaucetPage({ web3Props }) {
       {isParticipant && !hasRequested && (
         <button onClick={() => requestTokens()}>Request Voice Tokens</button>
       )}{" "}
-      {hasRequested && privateKey && (
+      {faucetEmpty && (
+        <div>Our faucet seems too be empty. Please message us on Discord.</div>
+      )}
+      {!faucetEmpty && hasRequested && privateKey && (
         <QRCodeFaucet privateKey={pkToUrl(privateKey)}></QRCodeFaucet>
       )}
     </Container>
