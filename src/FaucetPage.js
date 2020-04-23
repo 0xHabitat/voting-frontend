@@ -141,7 +141,6 @@ export default function FaucetPage({ web3Props }) {
             .balanceOf(web3Props.account)
             .call()
             .then(function (amount) {
-              console.log(amount);
               if (amount > 0) {
                 setParticipant(true);
                 var localStor = false;
