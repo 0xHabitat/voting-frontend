@@ -141,7 +141,7 @@ export default function FaucetPage({ web3Props }) {
       ERC20,
       voltConfig.CONTRACT_VOICE_CREDITS
     );
-
+    
     contract.methods
       .balanceOf(web3Props.account)
       .call()
