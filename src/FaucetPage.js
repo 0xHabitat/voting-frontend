@@ -141,13 +141,13 @@ export default function FaucetPage({ web3Props }) {
       ERC20,
       voltConfig.CONTRACT_VOICE_CREDITS
     );
-    
+
     contract.methods
       .balanceOf(web3Props.account)
       .call()
       .then(function (balance) {
         setBalances(fromWei(balance));
-        if ((balance = 0)) {
+        if (balance != 0) {
           redirect();
         } else {
           var localStor = false;
