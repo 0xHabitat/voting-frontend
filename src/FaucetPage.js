@@ -101,10 +101,13 @@ export default function FaucetPage({ web3Props }) {
             requestOptions
           ).then((response) => {
             const statusCode = response.status;
+            console.log(statusCode);
             if (statusCode == 200) {
               localStorage.setItem("requested-faucet", true);
             } else {
-              setFaucetError(response.json().errorMessage);
+              response.json().then(function (x) {
+                setFaucetError(x.errorMessage);
+              });
             }
             setRequested(true);
           });
@@ -128,11 +131,21 @@ export default function FaucetPage({ web3Props }) {
         if (balance != 0) {
           redirect();
         } else {
-          if (localStorage.getItem("requested-faucet")) {
-            setRequested(true);
-            return;
+          var localStor = false;
+          let privKey;
+          if (typeof Storage !== "undefined") {
+            localStor = true;
+            privKey = localStorage.getItem("privKey-faucet");
+            if (privKey) {
+              setPrivateKey(privKey);
+            }
+            const isRequested = localStorage.getItem("requested-faucet");
+            if (isRequested) {
+              setRequested(true);
+              return;
+            }
+            // Code for localStorage
           }
-
           const contract1 = new web3Props.web3.eth.Contract(
             ERC721,
             "0xD8Dcb0C856B5d0D234E70f9e5F13b6bc165F7dE4"
@@ -143,20 +156,12 @@ export default function FaucetPage({ web3Props }) {
             .then(function (amount) {
               if (amount > 0) {
                 setParticipant(true);
-                var localStor = false;
-                if (typeof Storage !== "undefined") {
-                  localStor = true;
-                  const privateKey = localStorage.getItem("privKey-faucet");
-                  if (privateKey) {
-                    setPrivateKey(privateKey);
-                    return;
+                if (!privKey) {
+                  const account = web3Props.web3.eth.accounts.create();
+                  setPrivateKey(account.privateKey);
+                  if (localStor) {
+                    localStorage.setItem("privKey-faucet", account.privateKey);
                   }
-                  // Code for localStorage
-                }
-                const account = web3Props.web3.eth.accounts.create();
-                setPrivateKey(account.privateKey);
-                if (localStor) {
-                  localStorage.setItem("privKey-faucet", account.privateKey);
                 }
               } else {
                 setParticipant(false);
@@ -173,7 +178,7 @@ export default function FaucetPage({ web3Props }) {
         <button onClick={() => requestTokens()}>Request Voice Tokens</button>
       )}{" "}
       {faucetError && <div>{faucetError} Please message us on Discord.</div>}
-      {!faucetError && hasRequested && privateKey && (
+      {!faucetError && privateKey && hasRequested && (
         <QRCodeFaucet privateKey={pkToUrl(privateKey)}></QRCodeFaucet>
       )}
     </Container>
