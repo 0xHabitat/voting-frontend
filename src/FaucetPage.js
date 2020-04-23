@@ -75,12 +75,11 @@ export default function FaucetPage({ web3Props }) {
 
   const requestTokens = async () => {
     try {
-      const publicKey = web3Props.web3.eth.accounts.privateKeyToAccount(
+      const votingAddress = web3Props.web3.eth.accounts.privateKeyToAccount(
         privateKey
       ).address;
-      console.log(publicKey);
-      web3Props.web3.eth
-        .sign(publicKey, web3Props.account)
+      web3Props.web3.eth.personal
+        .sign(votingAddress.replace('0x', ''), web3Props.account)
         .then(function (receipt) {
           const requestOptions = {
             method: "POST",
@@ -88,7 +87,7 @@ export default function FaucetPage({ web3Props }) {
             body: JSON.stringify({
               address: web3Props.account,
               color: 4,
-              toAddress: publicKey,
+              toAddress: votingAddress,
               sig: receipt,
             }),
           };
@@ -116,7 +115,7 @@ export default function FaucetPage({ web3Props }) {
       .call()
       .then(function (balance) {
         setBalances(fromWei(balance));
-        if (balance != 0) {
+        if (balance !== 0) {
           redirect();
         } else {
           if (localStorage.getItem("requested-faucet")) {
