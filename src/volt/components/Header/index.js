@@ -23,8 +23,8 @@ const BN = Web3.utils.BN;
 
 export const Header = props => {
   let { credits, maxCredits = 25, openMenu } = props;
-  if (maxCredits < 62) {
-    maxCredits = 62;
+  if (maxCredits < 100) {
+    maxCredits = 100;
   }
   let availableCredits = '--';
   if (credits) {
