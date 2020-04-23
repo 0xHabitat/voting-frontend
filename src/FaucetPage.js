@@ -172,7 +172,7 @@ export default function FaucetPage({ web3Props }) {
       {isParticipant && !hasRequested && (
         <button onClick={() => requestTokens()}>Request Voice Tokens</button>
       )}{" "}
-      {faucetError && <div>{errorMessage} Please message us on Discord.</div>}
+      {faucetError && <div>{faucetError} Please message us on Discord.</div>}
       {!faucetError && hasRequested && privateKey && (
         <QRCodeFaucet privateKey={pkToUrl(privateKey)}></QRCodeFaucet>
       )}
