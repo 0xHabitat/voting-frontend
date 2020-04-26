@@ -738,7 +738,7 @@ class VoteControls extends Component {
             max={max}
             steps={max + 1}
             value={voteUnits}
-            title={ noCredits ? 'Keine Voice Credits verfügbar' : ''}
+            title={ noCredits ? 'You have no voice credits' : ''}
             disabled={voteFormDisabled}
             onChange={(e) => !voteFormDisabled && this.setTokenNumber(e, alreadyVoted ? 1 : 0)}
           />
@@ -758,11 +758,12 @@ class VoteControls extends Component {
           <ActionButton
             disabled={voteBtnDisabled}
             onClick={this.submitOrUpdateVote}
-            title={ noCredits ? 'Keine Voice Credits verfügbar' : ''}
+            title={ noCredits ? 'You have no voice credits' : ''}
           >
-            { alreadyVoted ? 'Vote Ändern' : 'Send your vote' }
+            { alreadyVoted ? 'Withdraw your vote' : 'Send your vote' }
           </ActionButton>
-          {alreadyVoted && <ActionButton onClick={this.withdrawVote}>Zurücksetzen</ActionButton>}
+          {alreadyVoted && <ActionButton onClick={this.withdrawVote}>
+            withdraw</ActionButton>}
         </SubContainer>
       </Container>
     );
