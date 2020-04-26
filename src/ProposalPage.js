@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Flex, Box } from "rimble-ui";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import "dayjs/locale/de";
+import "dayjs/locale/en";
 
 import { Star, Back } from "./volt/components/Common";
 import { TopPart, Topic, ProposalId } from "./volt/components/ProposalsList/SingleProposal/styles";
