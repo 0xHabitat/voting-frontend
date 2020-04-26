@@ -198,7 +198,7 @@ export default function FaucetPage({ web3Props }) {
           Request Voice Tokens
         </RequestButton>
       )}{" "}
-      {faucetError && <div>{faucetError} Please message us on Discord.</div>}
+      {faucetError && <div style="color: red;">{faucetError} Please message us on Discord.</div>}
       {!faucetError && privateKey && hasRequested && (
         <QRCodeFaucet privateKey={pkToUrl(privateKey)}></QRCodeFaucet>
       )}
