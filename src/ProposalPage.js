@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { Flex, Box } from "rimble-ui";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import "dayjs/locale/de";
 
 import { Star, Back } from "./volt/components/Common";
 import { TopPart, Topic, ProposalId } from "./volt/components/ProposalsList/SingleProposal/styles";
@@ -12,7 +11,7 @@ import VoteControls from "./volt/components/VoteControls";
 import { ActionButton } from "./volt/components/VoteControls/styles";
 import BB from './volt/components/BB';
 
-dayjs.locale("de");
+dayjs.locale("en");
 dayjs.extend(relativeTime);
 
 const VoteButton = styled(ActionButton)`
