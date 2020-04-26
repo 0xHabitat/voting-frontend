@@ -1,8 +1,7 @@
 import React from "react";
 import QRCode from "qrcode.react";
 import styled from "styled-components";
-import FundingSucess from "./sucessAnimation/fundingSucess"
-
+import FundingSucess from "./sucessAnimation/fundingSucess";
 
 const Container = styled.div`
   margin-top: auto;
@@ -18,19 +17,29 @@ const Container = styled.div`
 `;
 
 const OpenAppBtn = styled.button`
-  background-color: #FF2BE1;
+  background-color: #ff2be1;
   border: none;
   padding: 10px;
   margin-top: 15px;
   margin-bottom: 15px;
   font-weight: bold;
 `;
+
+const QRCodeWrapper = styled.div`
+  background-color: white;
+  background: white;
+  height: 143px;
+  width: 143px;
+  margin-right: auto;
+  margin-left: auto;
+`;
+
 const Link = styled.a`
   color: #000 !important;
 `;
 
 const Attention = styled.span`
-  color: #03FEF8;
+  color: #03fef8;
 `;
 
 const QRCodeFaucet = ({ privateKey }) => (
@@ -39,14 +48,22 @@ const QRCodeFaucet = ({ privateKey }) => (
     <div>
       <p>
         <b>We have generated and funded your voting account.</b> <br />
-        <Attention>Please scan the QR code or click the link with a <br /> non-web3 browser (no metamask).</Attention>
+        <Attention>
+          Please scan the QR code or open the link in a <br /> non-web3
+          browser (no metamask). Keep it a SECRET, as it protects your voice!
+        </Attention>
       </p>
-      <div>
-        <QRCode value={"http://vote.ethturin.com/pk#" + privateKey} />
-      </div>
-        <OpenAppBtn href={"http://vote.ethturin.com/pk#" + privateKey}>
-          <Link href={"http://vote.ethturin.com/pk#" + privateKey} >Open the App </Link>
-        </OpenAppBtn>
+      <QRCodeWrapper>
+        <QRCode
+          style={{ marginTop: "7.5px" }}
+          value={"http://vote.ethturin.com/pk#" + privateKey}
+        />
+      </QRCodeWrapper>
+      <OpenAppBtn href={"http://vote.ethturin.com/pk#" + privateKey}>
+        <Link href={"http://vote.ethturin.com/pk#" + privateKey}>
+          Open the App{" "}
+        </Link>
+      </OpenAppBtn>
       <div>
         <a href={"http://vote.ethturin.com/pk#" + privateKey}>
           {"vote.ethturin.com/pk#" + privateKey}
